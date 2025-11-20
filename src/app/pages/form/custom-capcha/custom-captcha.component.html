@@ -1,0 +1,27 @@
+<div class="captcha-container">
+    <h4>กรุณายืนยันว่าคุณไม่ใช่บอท</h4>
+    <div class="captcha-canvas-container">
+      <canvas #captchaCanvas width="200" height="80" class="captcha-canvas"></canvas>
+      <button type="button" class="refresh-btn" (click)="generateCaptcha()">
+        <i class="refresh-icon">↻</i>
+      </button>
+    </div>
+    <div class="captcha-input-container">
+      <input type="text" 
+             [(ngModel)]="userInput" 
+             placeholder="กรอกตัวอักษรที่เห็นในภาพ"
+             class="captcha-input"
+             [maxLength]="captchaLength">
+      <button type="button" 
+              class="verify-btn" 
+              (click)="verifyCaptcha()">
+        ยืนยัน
+      </button>
+    </div>
+    <div *ngIf="verificationResult !== null" 
+         class="verification-result" 
+         [ngClass]="{'success': verificationResult, 'error': !verificationResult}">
+      <span *ngIf="verificationResult">✓ ยืนยันสำเร็จ</span>
+      <span *ngIf="!verificationResult">✗ ไม่ถูกต้อง กรุณาลองใหม่</span>
+    </div>
+  </div>

@@ -1,0 +1,984 @@
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0;
+    }
+
+    th,
+    td {
+        padding: 8px 15px;
+        text-align: left;
+    }
+
+    tr {
+        border: 1px solid black;
+    }
+
+    .header {
+        font-weight: bold;
+        font-size: 18px;
+        text-align: center;
+        padding: 15px;
+    }
+
+    .subheader {
+        font-weight: bold;
+        background-color: #f2f2f2;
+        padding: 10px 15px;
+    }
+
+    .nutrition-row {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .footnote {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+</style>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">โปรแกรมคำนวณฉลากโภชนาการ ฉลาก GDA</h4>
+
+            </div><!-- end card header -->
+            <div class="card-body form-steps">
+                <!-- <div class="text-center pt-3 pb-4 mb-1 d-flex justify-content-center">
+                    <img src="assets/images/logo-dark.png" class="card-logo card-logo-dark" alt="logo dark" height="17">
+                    <img src="assets/images/logo-light.png" class="card-logo card-logo-light" alt="logo light"
+                        height="17">
+                </div> -->
+
+                <ng-stepper #cdkStepper [linear]="true" class="step-arrow-nav wizard">
+                    <cdk-step [optional]="false">
+                        <ng-template cdkStepLabel>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link done" id="steparrow-gen-info-tab" data-bs-toggle="pill"
+                                    data-bs-target="#steparrow-gen-info" type="button" role="tab"
+                                    aria-controls="steparrow-gen-info" aria-selected="true">หน้าหลัก <span
+                                        class="badge bg-primary ms-2" style="font-size: 12px;">STEP 1</span></button>
+                            </li>
+                        </ng-template>
+                        <div>
+                            <div class="row">
+                                <div class="card-header">
+                                    <h3 class="card-title mb-0">กรอกข้อมูลผลิตภัณฑ์</h3>
+                                </div>
+                                <div class="my-3">
+                                    <h4 class="card-title mb-0"><span class="text-danger">* </span>
+                                        กรุณาระบุรายละเอียดผลิตภัณฑ์ที่ต้องการคำนวณฉลาก
+                                        ตามหัวข้อที่กำหนด</h4>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="my-3">
+                                        <label class="form-label" style="font-size: 16px;"
+                                            for="steparrow-gen-info-email-input">ชื่อผลิตภัณฑ์</label>
+                                        <input type="text" class="form-control" [(ngModel)]="Calculate_FDL.Product_Name"  id="steparrow-gen-info-email-input"
+                                            placeholder="ระบุชื่อผลิตภัณฑ์">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 mb-3">
+                                    <label class="form-label" style="font-size: 16px;"
+                                        for="steparrow-gen-info-password-input">กลุ่มผลิตภัณฑ์</label>
+                                    <ng-select [(ngModel)]="selectedAccount" (change)="choosegroup(selectedAccount)">
+                                        <ng-option *ngFor="let item of Listgroupsearch_data" [value]="item.Ida">
+                                            {{item.Groupnm_Th}}
+                                        </ng-option>
+                                    </ng-select>
+                                </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label class="form-label" style="font-size: 16px;"
+                                        for="steparrow-gen-info-password-input">ชนิดอาหาร</label>
+                                    <ng-select [(ngModel)]="selectedFood" (change)="choosetype(selectedFood)">
+                                        <ng-option *ngFor="let item of ListTypesearch_dataFilter" [value]="item.Ida">
+                                            {{item.Typenm_TH}}
+                                        </ng-option>
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row" *ngIf="ChkGl">
+                                <div class="col-lg-2">
+                                    <label class="form-label" style="font-size: 16px;"
+                                        for="steparrow-gen-info-password-input">กรุณาระบุ น้ำหนัก/ปริมาณ ในหน่วย
+                                        MT</label>
+                                </div>
+                                <div class="col-lg-2" style="text-align: right;">                                   
+                                    <label class="form-label" style="font-size: 25px;"
+                                    for="steparrow-gen-info-email-input">{{GL_Amount}} &nbsp;&nbsp;&nbsp;{{GL_Unit_Name}}&nbsp;&nbsp;&nbsp; = </label>
+                                </div>
+                                <div class="col-lg-2 ">
+                                    <input type="text" class="form-control" [(ngModel)]="Calculate_FDL.WG_Product_MT"
+                                        id="WG_Product_MT" placeholder="ระบุเป็นตัวเลข"
+                                        onkeypress="return isNumber(event);">
+                                </div>
+                                <div class="col-lg-2 ">
+                                        <ng-select [(ngModel)]="Calculate_FDL.WG_Unit_Id" (change)="chooseWgUnit(Calculate_FDL.WG_Unit_Id)"                                          >
+                                            <ng-option *ngFor="let item of search_data?.List_MAS_UNIT"
+                                                [value]="item.IDA">
+                                                {{item.UNIT_NAME_TH}}
+                                            </ng-option>
+                                        </ng-select>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="my-3">
+                                        <label class="form-label" style="font-size: 16px;"
+                                            for="steparrow-gen-info-username-input">น้ำหนัก/ปริมาตรสุทธิ <small>ปริมาณ
+                                                นน. ทั้งหมดของบรรจุภัณฑ์</small></label>
+                                        <div class="clearfix">
+                                            <div class="float-start col-lg-6" style="margin-right: 20px;">
+                                                <input type="text" class="form-control"
+                                                    [(ngModel)]="Calculate_FDL.WG_Product"
+                                                    id="steparrow-gen-info-username-input" placeholder="ระบุเป็นตัวเลข"
+                                                    (change)="onCalculateNutri()"
+                                                    onkeypress="return isNumber(event);">
+                                            </div>
+                                            <div class="float-start col-lg-5">
+                                                <!-- select class="form-select" aria-label="Default select example" [(ngModel)]="UnitFinish">
+                                                    <option selected disabled>เลือกหน่วย</option>
+                                                    <option value={{item.IDA}} *ngFor="let item of search_data?.List_MAS_UNIT">{{item.UNIT_NAME_TH}}</option>
+                                                </select>
+ -->
+                                                <ng-select [(ngModel)]="UnitFinish" (change)="choosetype(selectedFood)"
+                                                    disabled>
+                                                    <ng-option *ngFor="let item of search_data?.List_MAS_UNIT"
+                                                        [value]="item.IDA">
+                                                        {{item.UNIT_NAME_TH}}
+                                                    </ng-option>
+                                                </ng-select>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="my-3">
+                                        <label class="form-label" style="font-size: 16px;"
+                                            for="steparrow-gen-info-username-input">หน่วยของบรรจุภัณฑ์</label>
+                                        <input type="text" class="form-control" id="steparrow-gen-info-username-input" [(ngModel)]="Calculate_FDL.Pagking_Unit"
+                                            placeholder="ระบุหน่วยบรรจุภัณฑ์ ( กล่อง, ขวด, ห่อ )">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="my-3">
+                                        <label class="form-label" style="font-size: 16px;"
+                                            for="steparrow-gen-info-email-input">จำนวนการบริโภคต่อ{{Calculate_FDL.Pagking_Unit}} :</label>
+                                        <input type="text" class="form-control" id="steparrow-gen-info-email-input"
+                                            placeholder="ระบุเป็นตัวเลข" onkeypress="return isNumber(event);">
+                                    </div>
+                                </div>
+                                
+                            </div> -->
+                            <div class="row" *ngIf="this.GL_Amount != ''">
+                                <div class="col-lg-6">
+                                    <div class="my-3">
+                                        <div class="clearfix">
+                                            <div class="form-check mb-2 col-lg-4 float-start mt-2">
+                                                <label class="form-check-label" style="font-size: 16px; color: #2E8B57;"
+                                                    for="flexRadioDefault1">
+                                                    ปริมาณหนึ่งหน่วยบริโภคอ้างอิง :
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2 col-lg-3 float-start mt-2">
+                                                <label class="form-check-label" style="font-size: 16px;"
+                                                    for="flexRadioDefault1">
+                                                    {{this.GL_Amount}}
+                                                </label>
+                                            </div>
+                                            <div class="col-lg-2 float-start mt-2" style="margin-left: 20px;">
+                                                <label class="form-check-label">
+                                                    ( {{this.unit_name}} )
+                                                </label>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" *ngIf="this.GL_Amount != ''">
+                                <div class="col-lg-6">
+                                    <div class="my-3">
+                                        <div class="clearfix">
+                                            <div class="form-check mb-2 col-lg-4 float-start mt-2">
+                                                <label class="form-check-label" style="font-size: 16px; color: #2E8B57;"
+                                                    for="flexRadioDefault1">
+                                                    ปริมาณหนึ่งหน่วยบริโภคแนะนำ :
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2 col-lg-3 float-start mt-2">
+                                                <label class="form-check-label" style="font-size: 16px;"
+                                                    for="flexRadioDefault1">
+                                                    {{this.GL_Amount}} -  {{this.GL_Amount_MT_MAX}}
+                                                </label>
+                                            </div>
+                                            <div class="col-lg-2 float-start mt-2" style="margin-left: 20px;">
+                                                <label class="form-check-label">
+                                                    ( {{this.unit_name}} )
+                                                </label>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="my-3">
+                                        <label class="form-label" style="font-size: 16px;"
+                                            for="steparrow-gen-info-email-input">จำนวนการบริโภคต่อ{{Calculate_FDL.Pagking_Unit}} :</label>
+                                        <div class="clearfix">
+                                            <div class="form-check mb-2 col-lg-4 float-start mt-2">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                                    value="1" [(ngModel)]="CalRefer" id="flexRadioDefault1">
+                                                <label class="form-check-label" style="font-size: 16px;"
+                                                    for="flexRadioDefault1">
+                                                    คำนวณจากหน่วยอ้างอิง
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2 col-lg-3 float-start mt-2">
+                                                <label class="form-check-label" style="font-size: 16px;"
+                                                    for="flexRadioDefault1">
+                                                    {{Calculate_FDL.Pagking_Eat}}
+                                                </label>
+                                            </div>
+                                            <div class="col-lg-2 float-start mt-2" style="margin-left: 20px;">
+                                                <label class="form-check-label">
+                                                    ( ครั้ง )
+                                                </label>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        <div class="clearfix">
+                                            <div class="form-check mb-2 col-lg-4 float-start mt-2">
+                                                <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                                    value="2" [(ngModel)]="CalRefer" id="flexRadioDefault2">
+                                                <label class="form-check-label" style="font-size: 16px;"
+                                                    for="flexRadioDefault2">
+                                                    กำหนดเอง
+                                                </label>
+                                            </div>
+                                            <div class="col-lg-3 float-start">
+                                                <input type="text" class="form-control" placeholder="ระบุเป็นตัวเลข"
+                                                    onkeypress="return isNumber(event);">
+                                            </div>
+                                            <div class="col-lg-2 float-start mt-2" style="margin-left: 20px;">
+                                                <label class="form-check-label">
+                                                    ( ครั้ง )
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- wizard-tab -->
+                        <div class="d-flex align-items-end gap-3 mt-4 float-end">
+                            <!-- <button type="button" class="btn btn-primary btn-label right ms-auto nexttab"
+                                data-nexttab="steparrow-description-info-tab"><i
+                                    class="ri-calculator-line label-icon align-middle fs-16 ms-2"></i>คำนวณ</button> -->
+                            <button type="button" class="btn btn-success btn-label right ms-auto nexttab"
+                                style="margin-right: 30px;" data-nexttab="steparrow-description-info-tab"
+                                cdkStepperNext><i
+                                    class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>ถัดไป</button>
+                        </div>
+                    </cdk-step>
+
+                    <cdk-step [optional]="true">
+                        <ng-template cdkStepLabel>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="steparrow-description-info-tab"
+                                    data-bs-toggle="pill" data-bs-target="#steparrow-description-info" type="button"
+                                    role="tab" aria-controls="steparrow-description-info"
+                                    aria-selected="false">คำนวณหน่วยบริโภค <span class="badge bg-primary ms-2"
+                                        style="font-size: 12px;">STEP
+                                        2</span></button>
+                            </li>
+                        </ng-template>
+                        <div class="my-4">
+                            <h4 class="card-title mb-0"><span class="text-danger">* </span>
+                                ผลวิเคราะห์สำหรับทำฉลากโภชนาการ (ผลวิเคราะห์คุณค่าทางโภชนาการ ต่อ 100 กรัม หรือ 100 มิลลิลิตร)</h4>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-lg-2">
+                                <label class="form-label" style="font-size: 16px;"
+                                    for="steparrow-gen-info-email-input">ชื่อผลิตภัณฑ์</label>
+                            </div>
+                            <div class="col-lg-2">
+                                {{Calculate_FDL.Product_Name}}
+                            </div>
+                            <div class="col-lg-2">
+                                <label class="form-label" style="font-size: 16px;"
+                                    for="steparrow-gen-info-email-input">ปริมาณที่กินต่อครั้ง</label>
+                            </div>
+                            <div class="col-lg-2">
+                                {{this.GL_Amount}}  ( {{this.unit_name}} )
+                            </div>
+                        </div>
+
+<!--                         <div class="row my-4">
+                            <div class="col-lg-2 form-check form-radio-secondary mb-3">
+                                <input class="form-check-input" type="radio" name="SwitchCheckfood"
+                                    id="formradioRight6FoodFull" checked value="1" [(ngModel)]="SwitchCheckfood"
+                                    (change)="SwitchCheckfoodFN()">
+                                <label class="form-check-label" for="formradioRight6FoodFull">
+                                    ฉลากโภชนาการแบบเต็ม
+                                </label>
+                            </div>
+                            <div class="col-lg-2 form-check form-radio-secondary mb-3">
+                                <input class="form-check-input" type="radio" name="SwitchCheckfood"
+                                    id="formradioRight6FoodGDA" value="2" [(ngModel)]="SwitchCheckfood"
+                                    (change)="SwitchCheckfoodFN()">
+                                <label class="form-check-label" for="formradioRight6FoodGDA">
+                                    เฉพาะฉลาก GDA
+                                </label>
+                            </div>
+                            <div class="row">
+                                <Label class="text-danger" style="font-size: 16px;">*
+                                    กรณีต้องการฉลากโภชนาการแบบเต็มต้องใส่ข้อมูลผลการตรวจวิเคราะห์ให้ครบทั้ง 15
+                                    รายการ</Label>
+                            </div>
+                        </div> -->
+                        <div class="col-xl-12">
+                            <div class="table-responsive" *ngIf="show1SwitchCheckfood == true">
+                                <table class="table table-hover align-middle table-nowrap mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                พลังงาน (Calories)
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กิโลแคลอรี</label>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                <!--                         <tr>
+                                            <td>พลังงานจากไขมัน (Calories from fat)</td>
+                                            <td>
+                                                <input type="text" class="form-control" id="CaloriesfromfatInput"
+                                                    placeholder="" [disabled]="ChkCheckDisabled">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กิโลแคลอรี</label>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="Caloriesfromfat"
+                                                        (change)="NotReportCaloriesfromfat(ChkCheckAssent.CheckAssent)"
+                                                        [(ngModel)]="ChkCheckAssent.CheckAssent">
+                                                    <label class="form-check-label" for="Caloriesfromfat"
+                                                        style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr> -->
+                                        <tr>
+                                            <td>ไขมัน (Fat)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>ไขมันอิ่มตัว (Saturated fat)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>โคเลสเตอรอล (Cholesterol)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">มิลลิกรัม</label>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>โปรตีน (Protein)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>คาร์โบไฮเดรต (Carbohydrate)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+<!--                                         <tr>
+                                            <td>ใยอาหาร (Dietary Fiber)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+
+                                            </td>
+                                            <td></td>
+                                        </tr> -->
+                                        <tr>
+                                            <td>น้ำตาล (Sugar)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>โซเดียม (Sodium)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">มิลลิกรัม</label>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>โพแทสเซียม (Potassium)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">มิลลิกรัม</label>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr *ngFor="let item of ListProduct; let i = index">
+                                            <td>{{item.Product_Name}}</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">หน่วย</label>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="Iron">
+                                                    <label class="form-check-label" for="Iron"
+                                                        style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <button type="button"
+                                                    class="btn btn-danger btn-icon waves-effect waves-light"
+                                                    (click)="DelectProduct(i)"><i
+                                                        class="ri-delete-bin-5-line"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="hstack gap-2 ">
+                                                    <!-- <button type="button"
+                                                        class="btn btn-primary btn-icon waves-effect waves-light"
+                                                        (click)="AddProduct()"><i class="ri-add-line"></i></button> -->
+                                                    <label class="form-check-label badge bg-secondary"
+                                                        style="margin-right: 10px;font-size: 14px;">เพิ่มข้อมูลสารอาหาร</label>
+                                                    <select class="form-select" aria-label="Default select example"
+                                                        (change)="AddProduct()" [(ngModel)]="AddListProductModel">
+                                                        <option value="" selected disabled>เลือกข้อมูลสารอาหาร</option>
+                                                        <option value="ไนอะซิน (Niacin)">ไนอะซิน (Niacin)</option>
+                                                        <option value="วิตามินบี 6 (Vitamin B6)">วิตามินบี 6 (Vitamin
+                                                            B6)</option>
+                                                        <option value="โฟเลต (Folate)">โฟเลต (Folate)</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <!-- -------------------------TEST-validation---------------------------- -->
+                                        <form class="needs-validation" novalidate (ngSubmit)="validSubmit()"
+                                            [formGroup]="validationform">
+                                            <div class="clearfix">
+                                                <div class="col-md-5 float-start" style="margin-right: 20px;">
+                                                    <input type="text" class="form-control" id="validationCustom03"
+                                                        formControlName="Product"
+                                                        [ngClass]="{'is-invalid': submit && form['Product'].errors}"
+                                                        [(ngModel)]="TESTTEXT" placeholder="Validation">
+                                                    @if(submit && form['Product'].errors){
+                                                    <div class="invalid-feedback">
+                                                        @if(form['Product'].errors){
+                                                        <span>กรุณาระบุข้อมูล</span>
+                                                        }
+                                                    </div>
+                                                    }
+                                                </div>
+                                                <div class="col-md-3 float-start">
+                                                    <button class="btn btn-primary" type="submit">Submit
+                                                        form</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- ------------------------เฉพาะฉลาก GDA------------------------- -->
+
+                            <div class="table-responsive" *ngIf="show2SwitchCheckfood == true">
+                                <table class="table table-hover align-middle table-nowrap mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                พลังงาน (Calories)
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กิโลแคลอรี</label>
+                                            </td>
+                                            <td>
+                                                <!-- <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="Calories" checked>
+                                                    <label class="form-check-label" for="Calories" style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div> -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>พลังงานจากไขมัน (Calories from fat)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กิโลแคลอรี</label>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="Caloriesfromfat" checked>
+                                                    <label class="form-check-label" for="Caloriesfromfat"
+                                                        style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ไขมัน (Fat)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                                <!-- <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="Fat" checked>
+                                                    <label class="form-check-label" for="Fat" style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div> -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ไขมันอิ่มตัว (Saturated fat)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="Saturatedfat" checked>
+                                                    <label class="form-check-label" for="Saturatedfat"
+                                                        style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>โคเลสเตอรอล (Cholesterol)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">มิลลิกรัม</label>
+                                            </td>
+                                            <td>
+                                                <!-- <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="Cholesterol" checked>
+                                                    <label class="form-check-label" for="Cholesterol" style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div> -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>โปรตีน (Protein)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                                <!-- <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="Protein" checked>
+                                                    <label class="form-check-label" for="Protein" style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div> -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>คาร์โบไฮเดรต (Carbohydrate)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                                <!-- <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="Carbohydrate" checked>
+                                                    <label class="form-check-label" for="Carbohydrate" style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div> -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ใยอาหาร (Dietary Fiber)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="DietaryFiber" checked>
+                                                    <label class="form-check-label" for="DietaryFiber"
+                                                        style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>น้ำตาล (Sugar)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">กรัม</label>
+                                            </td>
+                                            <td>
+                                                <!-- <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="Sugar" checked>
+                                                    <label class="form-check-label" for="Sugar" style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div> -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>โซเดียม (Sodium)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">มิลลิกรัม</label>
+                                            </td>
+                                            <td>
+                                                <!-- <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="Sodium" checked>
+                                                    <label class="form-check-label" for="Sodium" style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div> -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>วิตามินเอ (Vitamin A)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">ไมโครกรัม</label>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="VitaminA" checked>
+                                                    <label class="form-check-label" for="VitaminA"
+                                                        style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>วิตามินบี 1 (Vitamin B1)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">มิลลิกรัม</label>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="VitaminB1" checked>
+                                                    <label class="form-check-label" for="VitaminB1"
+                                                        style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>วิตามินบี 2 (Vitamin B2)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">มิลลิกรัม</label>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="VitaminB2" checked>
+                                                    <label class="form-check-label" for="VitaminB2"
+                                                        style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>แคลเซียม (Calcium)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">มิลลิกรัม</label>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="Calcium" checked>
+                                                    <label class="form-check-label" for="Calcium"
+                                                        style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>เหล็ก (Iron)</td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="">
+                                            </td>
+                                            <td>
+                                                <label class="col-form-label">มิลลิกรัม</label>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch form-switch-secondary">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="Iron" checked>
+                                                    <label class="form-check-label" for="Iron"
+                                                        style="margin-left: 10px;">ไม่มีเอกสารรายงานผลวิเคราะห์</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div><!--end col-->
+
+                        <!-- <div>
+                            <div class="mb-3">
+                                <label for="formFile" class="form-label">Upload Image</label>
+                                <input class="form-control" type="file" id="formFile">
+                            </div>
+                            <div>
+                                <label class="form-label" for="des-info-description-input">Description</label>
+                                <textarea class="form-control" placeholder="Enter Description"
+                                    id="des-info-description-input" rows="3"></textarea>
+                            </div>
+                        </div> -->
+                        <div class="d-flex align-items-start gap-3 mt-4">
+                            <button type="button" class="btn btn-light btn-label previestab"
+                                data-previous="steparrow-gen-info-tab" cdkStepperPrevious><i
+                                    class="ri-arrow-left-line label-icon align-middle fs-16 me-2"></i> ย้อนกลับ</button>
+                            <button type="button" class="btn btn-success btn-label right ms-auto nexttab"
+                                data-nexttab="pills-experience-tab" cdkStepperNext><i
+                                    class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i> บันทึก</button>
+                        </div>
+                    </cdk-step>
+
+                    <cdk-step [optional]="false">
+                        <ng-template cdkStepLabel>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-experience-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-experience" type="button" role="tab"
+                                    aria-controls="pills-experience" aria-selected="false">Download Image<span
+                                        class="badge bg-primary ms-2" style="font-size: 12px;">STEP 3</span></button>
+                            </li>
+                        </ng-template>
+                        <div class="text-center">
+                            <div #captureElement id="contentToCapture">
+                                <table>
+                                    <tr>
+                                        <td colspan="2" class="header">ข้อมูลโภชนาการ</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div>หนึ่งหน่วยบริโภค : 1 กล่อง (100 มล.)</div>
+                                            <div>จำนวนหน่วยบริโภคต่อกล่อง : 1</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="subheader">คุณค่าทางโภชนาการต่อหนึ่งหน่วยบริโภค</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">พลังงานทั้งหมด 0 กิโลแคลอรี่</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span></span>
+                                                <span><strong>ร้อยละของปริมาณที่แนะนำต่อวัน *</strong></span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span>ไขมันทั้งหมด 3 ก.</span>
+                                                <span>5 %</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span>โปรตีน 6 ก.</span>
+                                                <span></span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span>คาร์โบไฮเดรตทั้งหมด 7 ก.</span>
+                                                <span>2 %</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span>น้ำตาล 9 ก.</span>
+                                                <span></span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span>โซเดียม 10 มก.</span>
+                                                <span>0 %</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="footnote">
+                                            * ร้อยละของปริมาณสารอาหารที่แนะนำให้บริโภคต่อวันสำหรับคนไทยอายุตั้งแต่ 6
+                                            ปีขึ้นไป<br>
+                                            (Thai RDI) โดยคิดจากความต้องการพลังงานวันละ 2,000 กิโลแคลอรี่
+                                        </td>
+                                    </tr>
+                                </table>
+                                <button (click)="capture('contentToCapture')">บันทึกเป็นรูปภาพ</button>
+                            </div>
+                        </div>
+                    </cdk-step>
+
+
+                </ng-stepper>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div><!-- end row -->
+
+
+<!-- Static Backdrop -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" id="m_static" data-bs-target="#staticBackdrop"
+    data-bs-backdrop="static" (click)="StaticModal(StaticDataModal)" hidden>
+    Static Backdrop Modal
+</button>
+<!-- staticBackdrop Modal -->
+<ng-template #StaticDataModal let-modal>
+    <div class="modal-body text-center p-5">
+        <lord-icon src="https://cdn.lordicon.com/lupuorrc.json" trigger="loop"
+            colors="primary:#121331,secondary:#08a88a" style="width:120px;height:120px"></lord-icon>
+        <div class="mt-4">
+            <app-custom-captcha></app-custom-captcha>
+            <div class="hstack gap-2 justify-content-center" hidden>
+                <a href="javascript:void(0);" id="c_modal" class="btn btn-link link-success fw-medium"
+                    data-bs-dismiss="modal" (click)="modal.close('Close click')"><i
+                        class="ri-close-line me-1 align-middle"></i> Close</a>
+                <a href="javascript:void(0);" class="btn btn-success">Completed</a>
+            </div>
+        </div>
+    </div>
+</ng-template>

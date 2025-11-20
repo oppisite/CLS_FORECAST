@@ -1,0 +1,191 @@
+<div class="container-fluid">
+    <!-- กราฟต่างๆ -->
+    <div class="row mt-4">
+        <!-- กราฟ 1: ตรวจสอบสต็อกคงเหลือเทียบ ROP (Bar + Line) -->
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">ตรวจสอบสต็อกคงเหลือเทียบ ROP</h5>
+                </div>
+                <div class="card-body">
+                    <apx-chart *ngIf="stockRopChartOptions" 
+                        [series]="stockRopChartOptions.series" 
+                        [chart]="stockRopChartOptions.chart" 
+                        [dataLabels]="stockRopChartOptions.dataLabels"
+                        [stroke]="stockRopChartOptions.stroke!" 
+                        [xaxis]="stockRopChartOptions.xaxis" 
+                        [yaxis]="stockRopChartOptions.yaxis"
+                        [grid]="stockRopChartOptions.grid" 
+                        [tooltip]="stockRopChartOptions.tooltip" 
+                        [legend]="stockRopChartOptions.legend"
+                        [title]="stockRopChartOptions.title"
+                        [plotOptions]="stockRopChartOptions.plotOptions!"
+                        [colors]="stockRopChartOptions.colors || []">
+                    </apx-chart>
+                </div>
+            </div>
+        </div>
+
+        <!-- กราฟ 2: สัดส่วนการใช้ยาแต่ละกลุ่ม (Donut) -->
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">สัดส่วนยาแต่ละกลุ่มในคลังยา</h5>
+                </div>
+                <div class="card-body">
+                    <apx-chart *ngIf="drugGroupDonutOptions" 
+                        [series]="drugGroupDonutOptions.series" 
+                        [chart]="drugGroupDonutOptions.chart" 
+                        [dataLabels]="drugGroupDonutOptions.dataLabels"
+                        [labels]="drugGroupDonutOptions.labels"
+                        [legend]="drugGroupDonutOptions.legend" 
+                        [title]="drugGroupDonutOptions.title"
+                        [tooltip]="drugGroupDonutOptions.tooltip"
+                        [colors]="drugGroupDonutOptions.colors || []"
+                        [plotOptions]="drugGroupDonutOptions.plotOptions!">
+                    </apx-chart>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- กราฟ 3: มูลค่าคงคลัง (Horizontal Bar) -->
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">มูลค่าคงคลัง</h5>
+                </div>
+                <div class="card-body">
+                    <apx-chart *ngIf="inventoryValueBarOptions" 
+                        [series]="inventoryValueBarOptions.series" 
+                        [chart]="inventoryValueBarOptions.chart" 
+                        [dataLabels]="inventoryValueBarOptions.dataLabels"
+                        [xaxis]="inventoryValueBarOptions.xaxis" 
+                        [yaxis]="inventoryValueBarOptions.yaxis"
+                        [grid]="inventoryValueBarOptions.grid" 
+                        [tooltip]="inventoryValueBarOptions.tooltip" 
+                        [legend]="inventoryValueBarOptions.legend"
+                        [title]="inventoryValueBarOptions.title"
+                        [plotOptions]="inventoryValueBarOptions.plotOptions!"
+                        [colors]="inventoryValueBarOptions.colors || []">
+                    </apx-chart>
+                </div>
+            </div>
+        </div>
+
+        <!-- กราฟ 4: วิเคราะห์ความเสี่ยงขาดยา (Bubble) -->
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">วิเคราะห์ความเสี่ยงขาดยา</h5>
+                </div>
+                <div class="card-body">
+                    <apx-chart *ngIf="riskBubbleOptions" 
+                        [series]="riskBubbleOptions.series" 
+                        [chart]="riskBubbleOptions.chart" 
+                        [dataLabels]="riskBubbleOptions.dataLabels"
+                        [xaxis]="riskBubbleOptions.xaxis" 
+                        [yaxis]="riskBubbleOptions.yaxis"
+                        [grid]="riskBubbleOptions.grid" 
+                        [tooltip]="riskBubbleOptions.tooltip" 
+                        [legend]="riskBubbleOptions.legend"
+                        [title]="riskBubbleOptions.title"
+                        [colors]="riskBubbleOptions.colors || []"
+                        [fill]="riskBubbleOptions.fill">
+                    </apx-chart>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ตารางแสดง LIST_MAS_DRUG -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">รายการยา</h5>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col-lg-5 text-right">
+                            <div class="search-box d-inline-block mb-2">
+                                <input type="text" class="form-control search" placeholder="Search..."
+                                    [(ngModel)]="serviceMasDrug.searchTerm">
+                                <i class="ri-search-line search-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-lg-7 text-right">
+                            <button type="button" class="btn btn-success me-2" (click)="exportToExcel()">
+                                <i class="ri-file-excel-2-line me-1"></i> Export Excel
+                            </button>
+                            <button type="button" class="btn btn-danger" (click)="exportToPDF()">
+                                <i class="ri-file-pdf-line me-1"></i> Export PDF
+                            </button>
+                        </div>
+    
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-gridjs">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%; text-align: center;">ลำดับ</th>
+                                    <!-- <th style="width: 15%; text-align: center;">รหัสสินค้า</th> -->
+                                    <th class="sort" style="width: 20%; text-align: center;" (click)="onSort('ProductTradeName')">ชื่อการค้า</th>
+                                    <th class="sort" style="width: 15%; text-align: center;" (click)="onSort('ProductTypeName')">ประเภทยา</th>
+                                    <th class="sort" style="width: 15%; text-align: center;" (click)="onSort('NarcoticGroupName')">กลุ่มยา</th>
+                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('rop')">ROP</th>
+                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('dop')">DOP</th>
+                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('soh')">จำนวนยา</th>
+                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('daily_use')">จำนวนที่ใช้ต่อวัน</th>
+                                    <th class="sort" style="width: 10%; text-align: center;" (click)="onSort('pricePerUnit')">ราคาต่อหน่วย</th>
+                                    <th class="sort" style="width: 10%; text-align: center;" (click)="onSort('totalPricePerUnit')">ราคารวมต่อหน่วย</th>
+                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('ProductUnitName')">หน่วย</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for(data of griddataMasDrug; track data.ProductCode){
+                                <tr>
+                                    <td style="text-align: center;">{{$index + 1}}</td>
+                                    <!-- <td style="text-align: center;"><ngb-highlight [result]="data.ProductCode">{{data.ProductCode}}</ngb-highlight></td> -->
+                                    <td><ngb-highlight [result]="data.ProductTradeName">{{data.ProductTradeName}}</ngb-highlight></td>
+                                    <td><ngb-highlight [result]="data.ProductTypeName">{{data.ProductTypeName}}</ngb-highlight></td>
+                                    <td><ngb-highlight [result]="data.NarcoticGroupName">{{data.NarcoticGroupName}}</ngb-highlight></td>
+                                    <td style="text-align: right;"><ngb-highlight [result]="data.rop">{{data.rop | number:'1.0-2'}}</ngb-highlight></td>
+                                    <td style="text-align: right;"><ngb-highlight [result]="data.dop">{{data.dop | number:'1.0-2'}}</ngb-highlight></td>
+                                    <td style="text-align: right;"><ngb-highlight [result]="data.soh">{{data.soh | number:'1.0-2'}}</ngb-highlight></td>
+                                    <td style="text-align: right;"><ngb-highlight [result]="data.daily_use">{{data.daily_use | number:'1.0-2'}}</ngb-highlight></td>
+                                    <td style="text-align: right;"><ngb-highlight [result]="data.pricePerUnit">{{data.pricePerUnit | number:'1.2-2'}}</ngb-highlight></td>
+                                    <td style="text-align: right;"><ngb-highlight [result]="data.totalPricePerUnit">{{data.totalPricePerUnit | number:'1.2-2'}}</ngb-highlight></td>
+                                    <td style="text-align: center;"><ngb-highlight [result]="data.ProductUnitName">{{data.ProductUnitName}}</ngb-highlight></td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row justify-content-md-between align-items-md-center mt-3">
+                        <div class="col-sm-12 col-md-5">
+                            <div class="dataTables_info mb-2" id="mas-drug-table_info" role="status" aria-live="polite">
+                                Showing
+                                {{serviceMasDrug.startIndex}} to
+                                {{serviceMasDrug.endIndex}} of {{serviceMasDrug.totalRecords}}
+                                entries
+                            </div>
+                        </div>
+                        <!--Pagination-->
+                        <div class="col-sm-12 col-md-5">
+                            <div class="text-md-right float-md-end gridjs-pagination">
+                                <ngb-pagination [collectionSize]="(totalMasDrug$ | async)!" [(page)]="serviceMasDrug.page"
+                                    [pageSize]="serviceMasDrug.pageSize">
+                                </ngb-pagination>
+                            </div>
+                        </div>
+                        <!-- End Pagination -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

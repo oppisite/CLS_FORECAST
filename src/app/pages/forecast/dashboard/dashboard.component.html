@@ -1,0 +1,200 @@
+
+<div class="dashboard-container">
+    <!-- ===== Filters ===== -->
+    <section class="dashboard-filters">
+      <div class="dashboard-filter-row">
+        <div class="dashboard-field">
+          <label>📅 เดือน</label>
+          <input type="month" [(ngModel)]="month" (change)="applyFilters()" />
+        </div>
+        <div class="dashboard-field">
+          <label>🏥 สถานพยาบาล</label>
+          <ng-select [(ngModel)]="facilityId" 
+          (change)="applyFilters()" [clearable]="false" 
+          placeholder="--กรุณาเลือก--"
+          [searchable]="true"
+          [internalSearch]="false"
+          [dropdownPosition]="'auto'"
+          [appendTo]="'body'"         
+          >
+            <ng-option *ngFor="let item of List_MAS_MEDICAL_FACILITY" [value]="item.CustomerTypeDescriptionTh">
+                {{item.CustomerTypeNameTh}}
+            </ng-option>
+        </ng-select>
+        </div>
+        <div class="dashboard-field">
+          <label>💊 ประเภทวัตถุฯ</label>
+          <ng-select [(ngModel)]="typeDrugCode" (change)="applyFilters()" [clearable]="false" 
+          placeholder="--กรุณาเลือก--"
+          [searchable]="true"
+          [internalSearch]="false"
+          [dropdownPosition]="'auto'"
+          [appendTo]="'body'"
+          >
+            <ng-option *ngFor="let t of List_MAS_TYPE_DRUG" [value]="t.Type_Drug_Code">{{ t.Type_Drug_Name }}</ng-option>
+          </ng-select>
+        </div>
+        <div class="dashboard-field">
+          <label>🧬 กลุ่มยา</label>
+          <ng-select [(ngModel)]="groupDrugCode" (change)="applyFilters()" [clearable]="false" 
+          placeholder="--กรุณาเลือก--"
+          [searchable]="true"
+          [internalSearch]="false"
+          [dropdownPosition]="'auto'"
+          [appendTo]="'body'"
+          >
+            <ng-option *ngFor="let g of List_MAS_GROUP_DRUG" [value]="g.GROUP_DRUG_CODE">{{ g.GROUP_DRUG_NAME }}</ng-option>
+          </ng-select>
+
+        </div>
+      </div>
+    </section>
+  
+    <!-- ===== KPI Cards ===== -->
+    <section class="dashboard-kpis" *ngIf="kpis">
+      <div class="dashboard-kpi-card">
+        <div class="dashboard-kpi-title">⚠️ เสี่ยงขาด</div>
+        <div class="dashboard-kpi-value">{{ kpis.stockRiskCount }}</div>
+        <div class="dashboard-kpi-sub">DOH ต่ำกว่า ROP</div>
+      </div>
+      <div class="dashboard-kpi-card">
+        <div class="dashboard-kpi-title">📊 DOH เฉลี่ย</div>
+        <div class="dashboard-kpi-value">{{ kpis.avgDOH | number: '1.0-1' }}</div>
+        <div class="dashboard-kpi-sub">วันคงเหลือเฉลี่ย</div>
+      </div>
+      <div class="dashboard-kpi-card">
+        <div class="dashboard-kpi-title">⏰ ใกล้หมดอายุ</div>
+        <div class="dashboard-kpi-value">
+          {{ kpis.nearExpiry.d30 }}/{{ kpis.nearExpiry.d60 }}/{{ kpis.nearExpiry.d90 }}
+        </div>
+        <div class="dashboard-kpi-sub">≤30 / 60 / 90 วัน</div>
+      </div>
+      <div class="dashboard-kpi-card">
+        <div class="dashboard-kpi-title">📋 คำขอซื้อ (รอ/อนุมัติ)</div>
+        <div class="dashboard-kpi-value">
+          {{ kpis.purchaseRequests.pending }}/{{ kpis.purchaseRequests.approved }}
+        </div>
+        <div class="dashboard-kpi-sub">อนุมัติแล้ว {{ currency(kpis.purchaseRequests.amountApproved) }} ฿</div>
+      </div>
+      <div class="dashboard-kpi-card">
+        <div class="dashboard-kpi-title">📦 PO ค้าง</div>
+        <div class="dashboard-kpi-value">{{ kpis.poOpen.count }}</div>
+        <div class="dashboard-kpi-sub">มูลค่า {{ currency(kpis.poOpen.amount) }} ฿</div>
+      </div>
+      <div class="dashboard-kpi-card">
+        <div class="dashboard-kpi-title">🎯 Accuracy</div>
+        <div class="dashboard-kpi-value">
+          {{ kpis.forecastAccuracyPrevMonth.mape | number: '1.0-1' }}% /
+          {{ kpis.forecastAccuracyPrevMonth.wape | number: '1.0-1' }}%
+        </div>
+        <div class="dashboard-kpi-sub">MAPE / WAPE (เดือนก่อน)</div>
+      </div>
+    </section>
+  
+    <!-- ===== Trend Chart ===== -->
+    <section class="dashboard-panel">
+      <div class="dashboard-panel-head">
+        <h3>📈 ยอดใช้จริง vs พยากรณ์ (รายเดือน)</h3>
+      </div>
+      <div class="dashboard-panel-body">
+        <apx-chart
+          #trendChart
+          *ngIf="lineOptions"
+          [series]="lineOptions!.series"
+          [chart]="lineOptions!.chart"
+          [dataLabels]="lineOptions!.dataLabels"
+          [stroke]="lineOptions!.stroke"
+          [xaxis]="lineOptions!.xaxis"
+          [yaxis]="lineOptions!.yaxis"
+          [grid]="lineOptions!.grid"
+          [tooltip]="lineOptions!.tooltip"
+          [legend]="lineOptions!.legend"
+          [fill]="lineOptions!.fill"
+          [title]="lineOptions!.title">
+        </apx-chart>
+      </div>
+    </section>
+  
+    <div class="dashboard-grid-2">
+      <!-- ===== Top Stock Risk ===== -->
+      <section class="dashboard-panel">
+        <div class="dashboard-panel-head">
+          <h3>⚠️ Top 10 เสี่ยงขาด</h3>
+        </div>
+        <div class="dashboard-panel-body dashboard-table-wrap">
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>รหัส</th><th>ชื่อการค้า</th><th class="num">SOH</th><th class="num">OnOrder</th>
+                <th class="num">DOH</th><th class="num">ROP</th><th class="num">แนะนำสั่ง</th><th>สถานะ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of stockRisk | slice:0:10">
+                <td class="dashboard-mono">{{ r.productCode }}</td>
+                <td>{{ r.tradeName }}</td>
+                <td class="num">{{ r.soh }}</td>
+                <td class="num">{{ r.onOrder }}</td>
+                <td class="num">
+                  <span [class]="dohClass(r.doh)">{{ r.doh | number:'1.0-1' }}</span>
+                </td>
+                <td class="num">{{ r.rop | number:'1.0-0' }}</td>
+                <td class="num"><strong>{{ r.suggestedQty }}</strong> {{ r.unit }}</td>
+                <td><a routerLink="/planning/suggestions" class="dashboard-btn-link">รายละเอียด</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+  
+      <!-- ===== Near Expiry ===== -->
+      <section class="dashboard-panel">
+        <div class="dashboard-panel-head">
+          <h3>⏰ Top 10 ใกล้หมดอายุ</h3>
+        </div>
+        <div class="dashboard-panel-body dashboard-table-wrap">
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>รหัส</th><th>ชื่อการค้า</th><th>LOT</th><th>หมดอายุ</th>
+                <th class="num">เหลือ (วัน)</th><th class="num">Qty</th><th class="num">มูลค่า</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of nearExpiry | slice:0:10">
+                <td class="dashboard-mono">{{ e.productCode }}</td>
+                <td>{{ e.tradeName }}</td>
+                <td>{{ e.lot }}</td>
+                <td>{{ e.expiryDate | date:'yyyy-MM-dd' }}</td>
+                <td class="num"><span [class]="expiryClass(e.daysToExpire)">{{ e.daysToExpire }}</span></td>
+                <td class="num">{{ e.qty }} {{ e.unit }}</td>
+                <td class="num">{{ e.value | number:'1.0-0' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  
+    <!-- ===== Actions ===== -->
+    <section class="dashboard-panel">
+      <div class="dashboard-panel-head">
+        <h3>📋 งานที่ต้องทำ</h3>
+      </div>
+      <div class="dashboard-panel-body dashboard-actions">
+        <div class="dashboard-action" *ngFor="let a of actions">
+          <div class="left">
+            <div class="dashboard-pill" [ngClass]="{'dashboard-pill-blue': a.type==='PR_APPROVAL', 'dashboard-pill-green': a.type==='REORDER'}">
+              {{ a.type }}
+            </div>
+            <div class="title">{{ a.title }}</div>
+            <div class="sub">กำหนด: {{ a.due | date:'yyyy-MM-dd' }}</div>
+          </div>
+          <a class="dashboard-btn" [routerLink]="a.link">เปิด</a>
+        </div>
+      </div>
+    </section>
+  
+    <!-- <div class="dashboard-loading" *ngIf="loading">กำลังโหลด...</div> -->
+  </div>
+  

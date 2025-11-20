@@ -1,0 +1,486 @@
+<div class="dashboard-container">
+  <!-- ===== Filters ===== -->
+  <section class="dashboard-filters dashboard-filters--sticky" role="region" aria-label="ตัวกรองข้อมูล">
+    <!-- <div class="dashboard-filter-row">
+        <div class="dashboard-field">
+          <label>📅 ช่วงเวลา</label>
+          <ng-select [(ngModel)]="periodId" 
+            (change)="choosePeriod()" 
+            [clearable]="false" 
+            placeholder="--กรุณาเลือก--"
+            [searchable]="true"
+            [internalSearch]="false"
+            [dropdownPosition]="'auto'"
+            [appendTo]="'body'"
+            [closeOnSelect]="true">
+            <ng-option *ngFor="let item of listPeriod" [value]="item.IDA">
+              {{ item.Period_Name }}
+            </ng-option>
+          </ng-select>
+        </div>
+        
+        <div class="dashboard-field" *ngIf="periodName !== ''">
+          <label>{{ periodName }}:</label>
+          <ng-select *ngIf="periodId == 1" 
+            [(ngModel)]="monthId" 
+            (change)="applyFilters()"
+            [clearable]="false" 
+            placeholder="--กรุณาเลือก--"
+            [searchable]="true"
+            [internalSearch]="false"
+            [dropdownPosition]="'auto'"
+            [appendTo]="'body'"
+            [closeOnSelect]="true">
+            <ng-option *ngFor="let item of listMonth" [value]="item.IDA">
+              {{ item.MONTH }}
+            </ng-option>
+          </ng-select>
+          
+          <ng-select *ngIf="periodId == 2" 
+            [(ngModel)]="quarterId" 
+            (change)="applyFilters()"
+            [clearable]="false" 
+            placeholder="--กรุณาเลือก--"
+            [searchable]="true"
+            [internalSearch]="false"
+            [dropdownPosition]="'auto'"
+            [appendTo]="'body'"
+            [closeOnSelect]="true">
+            <ng-option *ngFor="let item of listQuarter" [value]="item.IDA">
+              {{ item.QUARTER }}
+            </ng-option>
+          </ng-select>
+          
+          <div *ngIf="periodId == 3" class="date-range-container">
+            <div class="date-input-group">
+              <input type="date" 
+                class="datepicker" 
+                id="date_st" 
+                [(ngModel)]="dateStart"
+                (change)="applyFilters()"
+                placeholder="วันที่เริ่มต้น" />
+              <label for="date_st" class="date-label">
+                <i class="bi bi-calendar3"></i>
+              </label>
+            </div>
+            <span class="date-separator">ถึง</span>
+            <div class="date-input-group">
+              <input type="date" 
+                class="datepicker" 
+                id="date_end" 
+                [(ngModel)]="dateEnd"
+                (change)="applyFilters()"
+                placeholder="วันที่สิ้นสุด" />
+              <label for="date_end" class="date-label">
+                <i class="bi bi-calendar3"></i>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div> -->
+    <div class="dashboard-filter-row">
+      <div class="dashboard-field">
+          <label>🏥 กราฟ</label>
+          <ng-select [(ngModel)]="periodId" (change)="onPeriodChange()" [clearable]="false" placeholder="--กรุณาเลือก--"
+          [searchable]="true" [internalSearch]="false" [dropdownPosition]="'auto'" [appendTo]="'body'"
+          [closeOnSelect]="true">
+          <ng-option [value]="''">ทั้งหมด</ng-option>
+          <ng-option *ngFor="let item of listPeriod" [value]="item.IDA">
+            {{item.Period_Name}}
+          </ng-option>
+        </ng-select>
+      </div>
+      <div class="dashboard-field">
+          <label>🏥 ภูมิภาค</label>
+          <ng-select [(ngModel)]="regionId" (change)="chg_region()" [clearable]="false" placeholder="--กรุณาเลือก--"
+            [searchable]="true" [internalSearch]="false" [dropdownPosition]="'auto'" [appendTo]="'body'"
+            [closeOnSelect]="true">
+            <ng-option [value]="''">ทั้งหมด</ng-option>
+            <ng-option *ngFor="let item of List_MAS_REGION" [value]="item.IDA">
+              {{item.Region_Name}}
+            </ng-option>
+          </ng-select>
+      </div>
+      <div class="dashboard-field">
+          <label>🏥 เขตสุขภาพ</label>
+          <ng-select [(ngModel)]="healthZoneId" [clearable]="false" placeholder="--กรุณาเลือก--"
+            [searchable]="true" [internalSearch]="false" [dropdownPosition]="'auto'" [appendTo]="'body'"
+            [closeOnSelect]="true">
+            <ng-option [value]="''">ทั้งหมด</ng-option>
+            <ng-option *ngFor="let item of List_MAS_HEALTH_ZONE" [value]="item.IDA">
+              {{item.Health_District_Name}}
+            </ng-option>
+          </ng-select>
+      </div>
+      <div class="dashboard-field">
+      </div>
+      <div class="dashboard-field">
+        <label>🏥 ประเภทสถานพยาบาล</label>
+        <ng-select [(ngModel)]="facilityId" (change)="applyFilters()" [clearable]="false" placeholder="--กรุณาเลือก--"
+          [searchable]="true" [internalSearch]="false" [dropdownPosition]="'auto'" [appendTo]="'body'"
+          [closeOnSelect]="true">
+          <ng-option [value]="''">ทั้งหมด</ng-option>
+          <ng-option *ngFor="let item of List_MAS_MEDICAL_FACILITY" [value]="item.CustomerTypeCode">
+            {{item.CustomerTypeNameTh}}
+          </ng-option>
+        </ng-select>
+      </div>
+      <div class="dashboard-field">
+        <label>💊 ประเภทวัตถุฯ</label>
+        <ng-select [(ngModel)]="typeDrugCode" (change)="onTypeDrugChange()" [clearable]="false"
+          placeholder="--กรุณาเลือก--" [searchable]="true" [internalSearch]="false" [dropdownPosition]="'auto'"
+          [appendTo]="'body'" [closeOnSelect]="true">
+          <ng-option [value]="''">ทั้งหมด</ng-option>
+          <ng-option *ngFor="let t of List_MAS_TYPE_DRUG" [value]="t.Type_Drug_Code">{{ t.Type_Drug_Name }}</ng-option>
+        </ng-select>
+      </div>
+      <div class="dashboard-field">
+        <label>🧬 กลุ่มยา</label>
+        <ng-select [(ngModel)]="groupDrugCode" (change)="onGroupDrugChange()" [clearable]="false"
+          placeholder="--กรุณาเลือก--" [searchable]="true" [internalSearch]="false" [dropdownPosition]="'auto'"
+          [appendTo]="'body'" [closeOnSelect]="true">
+          <ng-option [value]="''">ทั้งหมด</ng-option>
+          <ng-option *ngFor="let g of List_MAS_GROUP_DRUG" [value]="g.GROUP_DRUG_CODE">{{ g.GROUP_DRUG_NAME
+            }}</ng-option>
+        </ng-select>
+
+      </div>
+      <div class="dashboard-field">
+        <label>🧬 ยา</label>
+        <ng-select [(ngModel)]="drugCode" (change)="applyFilters()" [clearable]="false" placeholder="--กรุณาเลือก--"
+          [searchable]="true" [internalSearch]="false" [dropdownPosition]="'auto'" [appendTo]="'body'"
+          [closeOnSelect]="true">
+          <ng-option [value]="''">ทั้งหมด</ng-option>
+          <ng-option *ngFor="let g of filteredDrugs" [value]="g.ProductCode">{{ g.ProductTradeName }}</ng-option>
+        </ng-select>
+      </div>
+      <div class="dashboard-field">
+      </div>
+      <div class="dashboard-field">
+      </div>
+      <div class="dashboard-field">
+      </div>
+      <div class="dashboard-field" style="display: flex; justify-content: flex-end;">
+        <input type="button" class="dashboard-btn" value="ค้นหา" (click)="searchPayOrder()">
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== KPI Cards ===== -->
+  <section class="dashboard-kpis" *ngIf="kpis">
+    <div class="dashboard-kpi-card dashboard-kpi-card-risk">
+      <div class="dashboard-kpi-title">
+        <div class="risk-title-left">
+          <span class="risk-icon">⚠️</span> <span class="risk-title-text">ยาเสี่ยงขาด</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger risk-email-btn" (click)="sendEmailRisk()" title="ส่งอีเมลแจ้งเตือน">
+          <i class="ri-mail-line me-1"></i> ส่ง Email
+        </button>
+      </div>
+      <div class="dashboard-kpi-value">{{ kpis.stockRiskCount }} <span class="value-unit">รายการ</span></div>
+      <div class="dashboard-kpi-sub">DOH ต่ำกว่า ROP</div>
+    </div>
+    <div class="dashboard-kpi-card">
+      <div class="dashboard-kpi-title">📊 DOH เฉลี่ย</div>
+      <div class="dashboard-kpi-value">{{ kpis.avgDOH | number: '1.0-1' }}</div>
+      <div class="dashboard-kpi-sub">วันคงเหลือเฉลี่ย</div>
+    </div>
+    <div class="dashboard-kpi-card">
+      <div class="dashboard-kpi-title">⏰ ใกล้หมดอายุ</div>
+      <div class="dashboard-kpi-value">
+        {{ kpis.nearExpiry.d30 }}/{{ kpis.nearExpiry.d60 }}/{{ kpis.nearExpiry.d90 }}
+      </div>
+      <div class="dashboard-kpi-sub">≤30 / 60 / 90 วัน</div>
+    </div>
+    <div class="dashboard-kpi-card">
+      <div class="dashboard-kpi-title">📦 ผลรวมปริมาณ</div>
+      <div class="dashboard-kpi-value">{{ kpis.totalQuantity | number: '1.0-0' }}</div>
+      <div class="dashboard-kpi-sub">จำนวนรวมทั้งหมด</div>
+    </div>
+    <div class="dashboard-kpi-card">
+      <div class="dashboard-kpi-title">💰 ผลรวมราคา</div>
+      <div class="dashboard-kpi-value">{{ kpis.totalValue | number: '1.0-0' }}</div>
+      <div class="dashboard-kpi-sub">มูลค่ารวม (บาท)</div>
+    </div>
+    <!-- <div class="dashboard-kpi-card">
+        <div class="dashboard-kpi-title">📋 คำขอซื้อ (รอ/อนุมัติ)</div>
+        <div class="dashboard-kpi-value">
+          {{ kpis.purchaseRequests.pending }}/{{ kpis.purchaseRequests.approved }}
+        </div>
+        <div class="dashboard-kpi-sub">อนุมัติแล้ว {{ currency(kpis.purchaseRequests.amountApproved) }} ฿</div>
+      </div>
+      <div class="dashboard-kpi-card">
+        <div class="dashboard-kpi-title">📦 PO ค้าง</div>
+        <div class="dashboard-kpi-value">{{ kpis.poOpen.count }}</div>
+        <div class="dashboard-kpi-sub">มูลค่า {{ currency(kpis.poOpen.amount) }} ฿</div>
+      </div> -->
+    <!-- <div class="dashboard-kpi-card">
+        <div class="dashboard-kpi-title">🎯 Accuracy</div>
+        <div class="dashboard-kpi-value">
+          {{ kpis.forecastAccuracyPrevMonth.mape | number: '1.0-1' }}% /
+          {{ kpis.forecastAccuracyPrevMonth.wape | number: '1.0-1' }}%
+        </div>
+        <div class="dashboard-kpi-sub">MAPE / WAPE (เดือนก่อน)</div>
+      </div> -->
+  </section>
+
+  <!-- ===== Trend Chart ===== -->
+  <section class="dashboard-panel">
+    <div class="dashboard-panel-head">
+      <h3>📈 ยอดใช้จริง vs พยากรณ์ (รายเดือน)</h3>
+    </div>
+    <div class="dashboard-panel-body">
+      <apx-chart role="img" aria-label="กราฟเปรียบเทียบยอดใช้จริงกับค่าพยากรณ์" #trendChart *ngIf="lineOptions"
+        [series]="lineOptions!.series" [chart]="lineOptions!.chart" [dataLabels]="lineOptions!.dataLabels"
+        [stroke]="lineOptions!.stroke" [xaxis]="lineOptions!.xaxis" [yaxis]="lineOptions!.yaxis"
+        [grid]="lineOptions!.grid" [tooltip]="lineOptions!.tooltip" [legend]="lineOptions!.legend"
+        [fill]="lineOptions!.fill" [title]="lineOptions!.title">
+      </apx-chart>
+    </div>
+  </section>
+
+  <div class="dashboard-grid-2">
+    <!-- ===== Top Stock Risk ===== -->
+    <section class="dashboard-panel">
+      <div class="dashboard-panel-head">
+        <h3>⚠️ ยาเสี่ยงขาด</h3>
+      </div>
+      <div class="dashboard-panel-body dashboard-table-wrap">
+        <div class="table-responsive">
+          <table class="table table-gridjs">
+            <thead>
+              <tr>
+                <th style="width: 15%; text-align: center;">ชื่อการค้า</th>
+                <th style="width: 5%; text-align: center;">SOH</th>
+                <th style="width: 5%; text-align: center;">DOH</th>
+                <th style="width: 5%; text-align: center;">ROP</th>
+                <th style="width: 5%; text-align: center;">จำนวนที่ใช้ต่อวัน</th>
+                <th style="width: 5%; text-align: center;">รายละเอียด</th>
+                <!-- <th style="width: 5%;">ดูรายละเอียด</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              @for(data of griddataRisk; track data.productCode){
+              <tr>
+                <td><ngb-highlight [result]="data.productName">{{data.productName}}</ngb-highlight>
+                </td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.soh">{{data.soh |
+                    number:'1.0-0'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.doh">{{data.doh |
+                    number:'1.0-0'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.rop">{{data.rop |
+                    number:'1.0-0'}}</ngb-highlight>
+                </td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.avgDailyUse">{{data.avgDailyUse |
+                    number:'1.0-0'}}</ngb-highlight></td>
+                <td style="text-align: center;">
+                  <i style="color: rgb(57, 31, 173); font-size: 25px;" class="ri-search-line" title="ดูข้อมูล"
+                    data-bs-toggle="modal" data-bs-target="#exampleModalgrid"
+                    (click)="fullModal(fullDataModal, data)"></i>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="row justify-content-md-between align-items-md-center">
+          <div class="col-sm-12 col-md-5">
+            <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+              Showing
+              {{serviceRisk.startIndex}} to
+              {{serviceRisk.endIndex}} of {{serviceRisk.totalRecords}}
+              entries
+            </div>
+          </div>
+          <!--Pagination-->
+          <div class="col-sm-12 col-md-5">
+            <div class="text-md-right float-md-end gridjs-pagination">
+              <ngb-pagination [collectionSize]="(totalRisk$ | async)!" [(page)]="serviceRisk.page"
+                [pageSize]="serviceRisk.pageSize">
+              </ngb-pagination>
+            </div>
+          </div>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Near Expiry ===== -->
+    <section class="dashboard-panel">
+      <div class="dashboard-panel-head">
+        <h3>⏰ ยาที่ใกล้หมดอายุ</h3>
+      </div>
+      <div class="dashboard-panel-body dashboard-table-wrap">
+        <div class="table-responsive">
+          <table class="table table-gridjs">
+            <thead>
+              <tr>
+                <!-- <th style="width: 5%; text-align: center;">รหัส</th> -->
+                <th style="width: 15%; text-align: center;">ชื่อการค้า</th>
+                <th style="width: 5%; text-align: center;">LOT</th>
+                <th style="width: 5%; text-align: center;">วันหมดอายุ</th>
+                <th style="width: 5%; text-align: center;">หมดอายุ</th>
+                <th style="width: 10%; text-align: center;">จำนวน</th>
+                <!-- <th style="width: 5%; text-align: center;">รายละเอียด</th> -->
+                <!-- <th style="width: 5%;">ดูรายละเอียด</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              @for(data of griddataNearExpiry; track data.productCode){
+              <tr>
+                <!-- <td style="text-align: center;"><ngb-highlight
+                              [result]="data.productCode">{{data.productCode}}</ngb-highlight></td> -->
+                <td><ngb-highlight [result]="data.productName">{{data.productName}}</ngb-highlight>
+                </td>
+                <td style="text-align: center;"><ngb-highlight [result]="data.lot">{{data.lot}}</ngb-highlight></td>
+                <td style="text-align: center;"><ngb-highlight [result]="data.exp_date">{{data.exp_date |
+                    date:'dd/MM/yyyy'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.daysToExpire">{{data.daysToExpire |
+                    number:'1.0-0' }} วัน</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.quantity">{{data.currentStock |
+                    number:'1.0-0'}} {{data.unit}}</ngb-highlight></td>
+                <!-- <td style="text-align: center;">
+                        <i style="color: rgb(57, 31, 173); font-size: 25px;" class="ri-search-line" title="ดูข้อมูล"
+                        data-bs-toggle="modal" data-bs-target="#exampleModalgrid"
+                        (click)="showpage(data)"></i>
+                      </td> -->
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="row justify-content-md-between align-items-md-center">
+          <div class="col-sm-12 col-md-5">
+            <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+              Showing
+              {{serviceNearExpiry.startIndex}} to
+              {{serviceNearExpiry.endIndex}} of {{serviceNearExpiry.totalRecords}}
+              entries
+            </div>
+          </div>
+          <!--Pagination-->
+          <div class="col-sm-12 col-md-5">
+            <div class="text-md-right float-md-end gridjs-pagination">
+              <ngb-pagination [collectionSize]="(totalNearExpiry$ | async)!" [(page)]="serviceNearExpiry.page"
+                [pageSize]="serviceNearExpiry.pageSize">
+              </ngb-pagination>
+            </div>
+          </div>
+          <!-- End Pagination -->
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== Actions ===== -->
+  <!-- <section class="dashboard-panel">
+      <div class="dashboard-panel-head">
+        <h3>📋 งานที่ต้องทำ</h3>
+      </div>
+      <div class="dashboard-panel-body dashboard-actions">
+        <div class="dashboard-action" *ngFor="let a of actions">
+          <div class="left">
+            <div class="dashboard-pill" [ngClass]="{'dashboard-pill-blue': a.type==='PR_APPROVAL', 'dashboard-pill-green': a.type==='REORDER'}">
+              {{ a.type }}
+            </div>
+            <div class="title">{{ a.title }}</div>
+            <div class="sub">กำหนด: {{ a.due | date:'yyyy-MM-dd' }}</div>
+          </div>
+          <a class="dashboard-btn" [routerLink]="a.link">เปิด</a>
+        </div>
+      </div>
+    </section> -->
+
+  <!-- <div class="dashboard-loading" *ngIf="loading">กำลังโหลด...</div> -->
+</div>
+
+<ng-template #fullDataModal let-modal>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalFullscreenLabel">ปริมาณและมูลค่าวัตถุเสพติด</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+        (click)="modal.dismiss('Close click')"></button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">ปริมาณและมูลค่าวัตถุเสพติด</h5>
+            </div>
+            <div class="card-body">
+              <!-- ตารางแสดงรายการเมนู -->
+              <div class="table-responsive">
+                <table class="table table-gridjs">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 10%; text-align: center;">ลำดับ</th>
+                      <th style="width: 30%; text-align: center;">ชื่อวัตถุเสพติด</th>
+                      <th style="width: 40%; text-align: center;">ประเภทยา</th>
+                      <th style="width: 20%; text-align: center;">Lot No.</th>
+                      <th style="width: 20%; text-align: center;">วันที่ผลิต</th>
+                      <th style="width: 20%; text-align: center;">วันที่หมดอายุ</th>
+                      <th style="width: 20%; text-align: center;">ปริมาณ</th>
+                      <th style="width: 20%; text-align: center;">ราคาทุน:หน่วย</th>
+                      <th style="width: 20%; text-align: center;">มูลค่า</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for(item of griddataDetail; track item.productCode){
+                    <tr>
+                      <td style="text-align: center;">{{$index + 1}}</td>
+                      <td><ngb-highlight [result]="item.ProductTradeName">{{item.ProductTradeName}}</ngb-highlight>
+                      </td>
+                      <td style="text-align: center;"><ngb-highlight
+                          [result]="item.ProductTypeName">{{item.ProductTypeName}}</ngb-highlight></td>
+                      <td style="text-align: center;"><ngb-highlight [result]="item.LOT">{{item.LOT}}</ngb-highlight>
+                      </td>
+                      <td style="text-align: center;"><ngb-highlight [result]="item.procure_date">{{item.procure_date |
+                          date:'dd/MM/yyyy'}}</ngb-highlight></td>
+
+                      <td style="text-align: center;"><ngb-highlight [result]="item.exp_date">{{item.exp_date |
+                          date:'dd/MM/yyyy'}}</ngb-highlight></td>
+                      <td style="text-align: right;"><ngb-highlight [result]="item.ProductAmount">{{item.ProductAmount |
+                          number:'1.0-0'}}</ngb-highlight></td>
+                      <td style="text-align: right;"><ngb-highlight [result]="item.capital_price">{{item.capital_price |
+                          number:'1.0-0'}}</ngb-highlight></td>
+                      <td style="text-align: right;"><ngb-highlight [result]="item.total_price">{{item.total_price |
+                          number:'1.0-0'}}</ngb-highlight></td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              <div class="row justify-content-md-between align-items-md-center">
+                <div class="col-sm-12 col-md-5">
+                  <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+                    Showing
+                    {{serviceDetail.startIndex}} to
+                    {{serviceDetail.endIndex}} of {{serviceDetail.totalRecords}}
+                    entries
+                  </div>
+                </div>
+                <!--Pagination-->
+                <div class="col-sm-12 col-md-5">
+                  <div class="text-md-right float-md-end gridjs-pagination">
+                    <ngb-pagination [collectionSize]="(totalNearExpiry$ | async)!" [(page)]="serviceNearExpiry.page"
+                      [pageSize]="serviceNearExpiry.pageSize">
+                    </ngb-pagination>
+                  </div>
+                </div>
+                <!-- End Pagination -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal" id="cdFullmodal"
+        (click)="modal.close('Close click')"><i class="ri-close-line me-1 align-middle"></i>
+        ยกเลิก</a>
+      <!-- <button type="button" class="btn btn-primary" (click)="SaveMas_Indicator()">บันทึก</button> -->
+    </div>
+  </div><!-- /.modal-content -->
+</ng-template><!-- /.modal-dialog -->

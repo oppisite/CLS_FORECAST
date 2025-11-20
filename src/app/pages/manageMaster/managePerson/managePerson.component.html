@@ -1,0 +1,168 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0 flex-grow-1">กำหนดสิทธิ์ผู้ใช้งาน</h4>
+            </div><!-- end card header -->
+
+            <div class="card-body">
+                <br />
+                <div class="row">
+                    <div class="col-lg-4 text-right">
+                        <div class="search-box d-inline-block mb-2">
+                            <input type="text" class="form-control search" placeholder="Search..."
+                                [(ngModel)]="service.searchTerm">
+                            <i class="ri-search-line search-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-right">
+
+                    </div>
+                    <div class="col-lg-2" style="text-align: end;">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#exampleModalgrid" (click)="fullModal(fullDataModal,old_Mas_Personal)">
+                            <i class="ri-add-line me-1"></i>เพิ่มผู้ใช้งาน
+                        </button>               
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-gridjs">
+                        <thead>
+                            <tr style="text-align: center;">
+                                <th style="width: 5%;">ลำดับ</th>
+                                <th class="sort" style="width: 45%;" (click)="onSort('NAME')">ชื่อผู้ใช้งาน</th>
+                                <th class="sort" style="width: 20%;" (click)="onSort('IDENTIFY')">เลขประจำตัวประชาชน</th>
+                                <th style="width: 5%;">แก้ไข</th>
+                                <th style="width: 5%;">ลบ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for(data of griddata; track $index){
+                            <tr>
+                                <td style="text-align: center;">{{$index + 1}}</td>
+                                <td style="text-align: left;"><ngb-highlight [result]="data.NAME"
+                                        [term]="service.searchTerm">{{data.NAME}}</ngb-highlight></td>                        
+                                <td style="text-align: center;"><ngb-highlight [result]="data.IDENTIFY"
+                                        [term]="service.searchTerm">{{data.IDENTIFY}}</ngb-highlight></td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModalgrid" (click)="fullModal(fullDataModal,data)">
+                                        แก้ไข
+                                    </button>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn btn-danger" (click)="deletePerson(data)">
+                                        ลบ
+                                    </button>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row justify-content-md-between align-items-md-center">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+                            Showing
+                            {{service.startIndex}} to
+                            {{service.endIndex}} of {{service.totalRecords}}
+                            entries
+                        </div>
+                    </div>
+                    <!-- Pagination -->
+                    <div class="col-sm-12 col-md-5">
+                        <div class="text-md-right float-md-end gridjs-pagination">
+                            <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="service.page"
+                                [pageSize]="service.pageSize">
+                            </ngb-pagination>
+                        </div>
+                    </div>
+                    <!-- End Pagination -->
+                </div>
+            </div><!-- end card-body -->
+        </div><!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+
+<ng-template #fullDataModal let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalFullscreenLabel">กำหนดสิทธิ์ผู้ใช้งาน</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                (click)="modal.dismiss('Close click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">จัดการสิทธิ์ผู้ใช้งาน</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- ฟอร์มเพิ่มเมนู -->
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label">ชื่อผู้ใช้งาน:</label>
+                                    <input type="text" class="form-control" [(ngModel)]="Mas_Personal.NAME">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">เลขประจำตัวประชาชน:</label>
+                                    <input type="text" class="form-control" maxlength="13" pattern="[0-9]{13}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" [(ngModel)]="Mas_Personal.IDENTIFY" placeholder="กรอก 13 หลัก">
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label">กลุ่มสิทธิ์:</label>
+                                    <select class="form-select" [(ngModel)]="selectedGroupPermission">
+                                        <option value="">Select an Option</option>
+                                        <option *ngFor="let menu of List_Group_Permission" [value]="menu.IDA">{{menu.Group_Name}} </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="button" class="btn btn-success" (click)="addGroupPermission()">
+                                        <i class="ri-add-line me-1"></i>เพิ่ม
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- ตารางแสดงรายการเมนู -->
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 10%; text-align: center;">ลำดับ</th>
+                                            <th style="width: 30%; text-align: center;">ชื่อเมนู</th>
+                                            <th style="width: 20%; text-align: center;">ลบเมนู</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let menu of List_Personal_Group_Permission; let i = index">
+                                            <td class="text-center">{{i + 1}}</td>
+                                            <td class="text-center">{{menu.Group_Name}}</td>
+
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-danger btn-sm" (click)="removeGroupPermission(i)">
+                                                    ลบ
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="List_Personal_Group_Permission.length === 0">
+                                            <td colspan="3" class="text-center text-muted">ไม่มีเมนูที่กำหนด</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="saveGroupPermission()">บันทึก</button>
+            <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"
+                id="cdFullmodal" (click)="modal.close('Close click')"><i class="ri-close-line me-1 align-middle"></i>
+                ยกเลิก</a>
+            <!-- <button type="button" class="btn btn-primary" (click)="SaveMas_Indicator()">บันทึก</button> -->
+        </div>
+    </div><!-- /.modal-content -->
+</ng-template><!-- /.modal-dialog -->
