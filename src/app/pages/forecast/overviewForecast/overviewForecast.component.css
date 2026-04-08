@@ -137,6 +137,30 @@ th {
     gap: 8px;
 }
 
+.dashboard-field .forecast-month-input {
+    appearance: none;
+    background: rgba(255, 255, 255, 0.8);
+    color: #1e293b;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    width: 100%;
+}
+
+.dashboard-field .forecast-month-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+}
+
+.dashboard-field .forecast-month-help {
+    color: #64748b;
+    font-size: 12px;
+}
+
 .dashboard-field label {
     font-size: 13px;
     color: #475569;

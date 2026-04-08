@@ -131,12 +131,15 @@ export class OverviewForecastComponent {
     regionId = '';
     healthZoneId = '';
     // ======= Period Selection =======
-    periodId: number | null = null;
+    periodId: number | string | null = null;
     periodName = '';
     monthId: number | null = null;
     quarterId: number | null = null;
     dateStart = '';
     dateEnd = '';
+    forecastMonthAhead = 3;
+    minForecastMonthAhead = 1;
+    maxForecastMonthAhead = 24;
     
     // ======= Period Lists =======
     listPeriod = [
@@ -555,10 +558,36 @@ export class OverviewForecastComponent {
 
     // เมื่อเปลี่ยน period ของกราฟ
     onPeriodChange(): void {
+        this.forecastMonthAhead = this.getSafeForecastMonthAhead();
         // เรียก prepareForecastChart ใหม่เมื่อเปลี่ยน period
         if (this.Group_Pay_Drug && this.List_product) {
             this.prepareForecastChart(this.Group_Pay_Drug, this.List_product, this.drugCode);
         }
+    }
+
+    onForecastMonthAheadChange(): void {
+        this.forecastMonthAhead = this.getSafeForecastMonthAhead();
+        this.onPeriodChange();
+    }
+
+    isMonthlyForecastMode(): boolean {
+        const periodId = this.getNormalizedPeriodId();
+        return periodId === 2;
+    }
+
+    private getSafeForecastMonthAhead(): number {
+        const value = Number(this.forecastMonthAhead);
+        if (!Number.isFinite(value)) {
+            return 3;
+        }
+
+        const roundedValue = Math.floor(value);
+        return Math.min(this.maxForecastMonthAhead, Math.max(this.minForecastMonthAhead, roundedValue));
+    }
+
+    private getNormalizedPeriodId(): number {
+        const parsed = typeof this.periodId === 'string' ? parseInt(this.periodId, 10) : this.periodId;
+        return Number.isFinite(parsed as number) ? (parsed as number) : 2;
     }
 
     // Filter ยาตามประเภทยาและกลุ่มยา
@@ -732,6 +761,7 @@ export class OverviewForecastComponent {
             'TYPE_DRUG_ID': this.typeDrugCode == '' ? 0 : this.typeDrugCode,
             'GROUP_DRUG_CODE': this.groupDrugCode,
             'NARCROTIC_CODE': this.drugCode,
+            'FORECAST_MONTH_AHEAD': this.getSafeForecastMonthAhead(),
         }
         let model = {
             PROCESS_CODE: '',
@@ -1107,7 +1137,7 @@ getKpis(historyData: any[], stockData: any[], productCode: string): void {
     const stock = code ? stockData.filter(x => x.ProductCode === code) : stockData;
   
     // 2) จัดกลุ่มข้อมูลตาม period ที่เลือก
-    const periodId = this.periodId ? (typeof this.periodId === 'string' ? parseInt(this.periodId) : this.periodId) : 2; // default เป็นเดือน (2)
+    const periodId = this.getNormalizedPeriodId(); // default เป็นเดือน (2)
     let aggMap: Record<string, { label: string; value: number }> = {};
     let periodData: { label: string; value: number }[] = [];
     
@@ -1194,7 +1224,7 @@ getKpis(historyData: any[], stockData: any[], productCode: string): void {
     const doh = daily > 0 ? (stockQty / daily) : 0;
   
     // 9) สร้าง Forecast ตาม period
-    const futureCount = periodId === 1 ? 7 : periodId === 2 ? 3 : periodId === 3 ? 2 : 1; // วัน: 7, เดือน: 3, ไตรมาส: 2, ปี: 1
+    const futureCount = periodId === 2 ? this.getSafeForecastMonthAhead() : periodId === 1 ? 7 : periodId === 3 ? 2 : 1;
     const lastLabel = pastLabels[pastLabels.length - 1] || this.getCurrentLabel(periodId);
     const forecastLabels: string[] = [];
     const forecastValues: number[] = [];
@@ -1294,7 +1324,7 @@ getKpis(historyData: any[], stockData: any[], productCode: string): void {
       legend: { position: 'top' },
       grid: { strokeDashArray: 4 },
       tooltip: { shared: true, y: { formatter: (v: number) => (v == null ? '' : Math.round(v).toLocaleString()) } },
-      title: { text: 'ยอดใช้จริง vs คาดการณ์ vs สต็อกคงเหลือ', align: 'left' },
+      title: { text: `ยอดใช้จริง vs คาดการณ์ vs สต็อกคงเหลือ${periodId === 2 ? ` (ล่วงหน้า ${futureCount} เดือน)` : ''}`, align: 'left' },
       xaxis: { categories },
       yaxis: { decimalsInFloat: 0, min: yMin, max: yMax, labels: { formatter: (v: number) => Math.round(v).toLocaleString() } },
       series: [

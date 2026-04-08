@@ -90,6 +90,18 @@
           </ng-option>
         </ng-select>
       </div>
+      <div class="dashboard-field" *ngIf="isMonthlyForecastMode()">
+        <label>📆 คาดการณ์ล่วงหน้า (เดือน)</label>
+        <input
+          type="number"
+          class="forecast-month-input"
+          [(ngModel)]="forecastMonthAhead"
+          [min]="minForecastMonthAhead"
+          [max]="maxForecastMonthAhead"
+          (change)="onForecastMonthAheadChange()"
+        />
+        <small class="forecast-month-help">เลือกได้ {{ minForecastMonthAhead }}-{{ maxForecastMonthAhead }} เดือน</small>
+      </div>
       <div class="dashboard-field">
           <label>🏥 ภูมิภาค</label>
           <ng-select [(ngModel)]="regionId" (change)="chg_region()" [clearable]="false" placeholder="--กรุณาเลือก--"
