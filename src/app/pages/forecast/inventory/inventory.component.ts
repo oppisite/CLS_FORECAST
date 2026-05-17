@@ -1285,6 +1285,7 @@ getKpis(historyData: any[], stockData: any[], productCode: string): void {
       // ราคาต่อหน่วย (Price per Unit)
       const pricePerUnit = parseFloat(drug.ProductPrice || '0');
       
+      const doh_use = daily > 0 ? (soh / daily) : 0;
       // ราคารวมต่อหน่วย (Total Price per Unit) - ราคารวมของสต็อกทั้งหมดต่อหน่วย
       const totalPricePerUnit = soh > 0 ? (stock.reduce((a: number, b: any) => a + (Number(b.total_price) || 0), 0) / soh) : pricePerUnit;
       
@@ -1292,6 +1293,7 @@ getKpis(historyData: any[], stockData: any[], productCode: string): void {
         ...drug,
         rop: rop,
         dop: dop,
+        doh: doh_use,
         soh: soh,
         daily_use: daily,
         pricePerUnit: pricePerUnit,
@@ -1536,6 +1538,7 @@ getKpis(historyData: any[], stockData: any[], productCode: string): void {
       // หากต้องการไม่กรอง pricePerUnit=0 ให้เอาออกจากเงื่อนไข
       .map((drug: any) => ({
         soh: Number(drug.soh) || 0,
+        doh: Number(drug.doh) || 0,
         daily_use: Number(drug.daily_use) || 0,
         price: Number(drug.pricePerUnit) || 0,
         name: drug.ProductTradeName || 'ไม่ระบุ',
@@ -1559,6 +1562,7 @@ getKpis(historyData: any[], stockData: any[], productCode: string): void {
       x: d.soh,
       y: d.daily_use,
       z: scaleZ(d.price),
+      doh: d.doh,
       rawZ: d.price,
       name: d.name,
       risk: d.soh < d.rop ? 'high' : 'medium'
@@ -1623,6 +1627,7 @@ getKpis(historyData: any[], stockData: any[], productCode: string): void {
             <div style="padding:10px;">
               <strong>${name}</strong><br/>
               SOH: ${Math.round(x).toLocaleString()}<br/>
+              DOH: ${Math.round(seriesData.doh).toLocaleString()}  วัน<br/>
               ใช้ต่อวัน: ${Math.round(y).toLocaleString()}<br/>
               ราคาต่อหน่วย: ฿${rawZ.toLocaleString()}<br/>
              

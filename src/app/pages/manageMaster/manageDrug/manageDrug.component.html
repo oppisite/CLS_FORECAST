@@ -1,0 +1,323 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0 flex-grow-1">จัดการข้อมูลยา</h4>
+            </div><!-- end card header -->
+
+            <div class="card-body">
+                <br />
+                <div class="row">
+                    <div class="col-lg-4 text-right">
+                        <div class="search-box d-inline-block mb-2">
+                            <input type="text" class="form-control search" placeholder="Search..."
+                                [(ngModel)]="service.searchTerm">
+                            <i class="ri-search-line search-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-right">
+
+                    </div>
+                    <div class="col-lg-2" style="text-align: end;">
+                        <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#exampleModalgrid" (click)="fullModal(fullDataModal,old_Group_Permission)">
+                            <i class="ri-add-line me-1"></i>เพิ่มกลุ่มผู้ใช้งาน
+                        </button>                -->
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-gridjs">
+                        <thead>
+                            <tr style="text-align: center;">
+                                <th style="width: 5%;">ลำดับ</th>
+                                <th class="sort" style="width: 15%;" (click)="onSort('ProductTypeName')">ประเภทยา</th>
+                                <th class="sort" style="width: 15%;" (click)="onSort('NarcoticGroupName')">กลุ่มยา</th>
+                                <th class="sort" style="width: 10%;" (click)="onSort('FK_Product_SubGroup')">กลุ่มยาย่อย</th>
+                                <th class="sort" style="width: 25%;" (click)="onSort('ProductTradeName')">ชื่อทางการค้า</th>
+                               
+                                <th class="sort" style="width: 5%;" (click)="onSort('avgdemand')">ยอดขายเฉลี่ยต่อวัน</th>
+                                <th class="sort" style="width: 5%;" (click)="onSort('inspection_qty')">สต็อกคงเหลือ</th>
+                                <th class="sort" style="width: 5%;" (click)="onSort('DOH')">วันคงเหลือ(DOH)</th>
+                                <th class="sort" style="width: 5%;" (click)="onSort('ReorderPoint')">จุดสั่งซื้อ(ROP)</th>
+                                <th class="sort" style="width: 5%;" (click)="onSort('ProductPrice')">ราคาขายต่อหน่วย</th>
+                                <th class="sort" style="width: 5%;" (click)="onSort('ProductUnitName')">หน่วย</th>
+                                <!-- <th style="width: 10%;">วันที่ส่งมอบยา</th> -->
+                                <th style="width: 5%;">แก้ไข</th>
+                               
+                                <!-- <th style="width: 5%;">ลบ</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for(data of griddata; track $index){
+                            <tr>
+                                <td style="text-align: center;">{{$index + 1}}</td>
+                                <td style="text-align: center;"><ngb-highlight [result]="data.ProductTypeName"
+                                        [term]="service.searchTerm">{{data.ProductTypeName}}</ngb-highlight></td>  
+                            <td style="text-align: center;"><ngb-highlight [result]="data.NarcoticGroupName"
+                                    [term]="service.searchTerm">{{data.NarcoticGroupName}}</ngb-highlight></td>  
+                                <td style="text-align: center;"><ngb-highlight [result]="data.FK_Product_SubGroup"
+                                    [term]="service.searchTerm">{{data.Product_SubGroup_Name}}</ngb-highlight></td>  
+                                <td style="text-align: left;"><ngb-highlight [result]="data.ProductTradeName"
+                                    [term]="service.searchTerm">{{data.ProductTradeName}}</ngb-highlight></td>  
+                             
+                                <td style="text-align: right;"><ngb-highlight [result]="(data.avgdemand ?? 0) / 30"
+                                    [term]="service.searchTerm">{{ ((data.avgdemand ?? 0) / 30) | number:'1.2-2' }}</ngb-highlight></td>  
+                                <td style="text-align: right;"><ngb-highlight [result]="data.inspection_qty"
+                                    [term]="service.searchTerm">{{ (data.inspection_qty ?? 0) | number }}</ngb-highlight></td>  
+                                <td style="text-align: right;"><ngb-highlight [result]="data.DOH"
+                                    [term]="service.searchTerm">{{ data.DOH ?? 0 }}</ngb-highlight></td>  
+                                <td style="text-align: right;"><ngb-highlight [result]="data.ReorderPoint"
+                                    [term]="service.searchTerm">{{data.ReorderPoint || 0}}</ngb-highlight></td>  
+                                    <td style="text-align: right;"><ngb-highlight [result]="data.ProductPrice"
+                                        [term]="service.searchTerm">{{data.ProductPrice}}</ngb-highlight></td>  
+                                <td style="text-align: right;"><ngb-highlight [result]="data.ProductUnitName"
+                                    [term]="service.searchTerm">{{data.ProductUnitName}}</ngb-highlight></td>  
+                                <!-- <td style="text-align: center;">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModalgrid" (click)="openDeliveryDate(addDeliveryDateModal, data)">
+                                        <i class="ri-add-line me-1"></i>วันที่ส่งมอบยา
+                                    </button>
+                                </td> -->
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModalgrid" (click)="fullModal(fullDataModal,data)">
+                                        แก้ไข
+                                    </button>
+                                </td>
+                                <!-- <td style="text-align: center;">
+                                    <button type="button" class="btn btn-danger" (click)="deleteIndicator(data)">
+                                        ลบ
+                                    </button>
+                                </td> -->
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row justify-content-md-between align-items-md-center">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+                            Showing
+                            {{service.startIndex}} to
+                            {{service.endIndex}} of {{service.totalRecords}}
+                            entries
+                        </div>
+                    </div>
+                    <!-- Pagination -->
+                    <div class="col-sm-12 col-md-5">
+                        <div class="text-md-right float-md-end gridjs-pagination">
+                            <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="service.page"
+                                [pageSize]="service.pageSize">
+                            </ngb-pagination>
+                        </div>
+                    </div>
+                    <!-- End Pagination -->
+                </div>
+            </div><!-- end card-body -->
+        </div><!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+
+<ng-template #fullDataModal let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalFullscreenLabel">แก้ไขข้อมูลยา</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                (click)="modal.dismiss('Close click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">รายละเอียดข้อมูลยา</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">รหัสยา (ProductCode)</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.ProductCode" disabled>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">ประเภทยา (ProductTypeName)</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.ProductTypeName" disabled>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">กลุ่มยา (NarcoticGroupName)</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.NarcoticGroupName" disabled>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label>กลุ่มยาย่อย</label>
+                                    <ng-select
+                                        [(ngModel)]="MAS_Product_Stock.FK_Product_SubGroup"
+                                        [items]="List_MAS_Product_SubGroup"
+                                        bindLabel="SubGroupDrugName"
+                                        bindValue="IDA"
+                                        [clearable]="false"
+                                        [searchable]="true"
+                                        (ngModelChange)="onChangeProductSubGroup($event)"
+                                        placeholder="--กรุณาเลือก--">
+                                    </ng-select>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label">ชื่อทางการค้า (ProductTradeName)</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.ProductTradeName" disabled>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">LeadTime (เดือน)</label>
+                                    <input type="number" class="form-control"
+                                           [(ngModel)]="MAS_Product_Stock.LeadTime"
+                                           min="0" step="1" pattern="^[0-9]+$">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">งวดการสั่งซื้อ (เดือน)</label>
+                                    <input type="number" class="form-control"
+                                           [(ngModel)]="MAS_Product_Stock.WorkPeriod"
+                                           min="0" step="1" pattern="^[0-9]+$">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">ยอดขายเฉลี่ยต่อเดือน(เดือนที่มีการสั่งซื้อครั้งแรกจนถึงปัจจุบันมาเฉลี่ย)</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.avgdemand" disabled>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">ยอดขายเฉลี่ยต่อวัน</label>
+                                    <input type="text" class="form-control" [value]="(MAS_Product_Stock.avgdemand / 30) | number:'1.2-2'" disabled>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">สต็อกคงเหลือ</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.inspection_qty" disabled>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">วันคงเหลือ (สต็อกคงเหลือ / ยอดขายเฉลี่ยต่อวัน)</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.DOH" disabled>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">จำนวนการสั่งซื้อสูงสุดย้อนไป 12 เดือน</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.MaxMonthUsageLastYear" disabled>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Safety Stock(จำนวนการสั่งซื้อสูงสุดย้อนไป 12 เดือน * LeadTime)</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.SafetyStock" disabled>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">จุดสั่งซื้อ ((LeadTime * ยอดขายเฉลี่ยต่อเดือน) + Safety Stock)</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.ReorderPoint" disabled>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                               
+                                <div class="col-md-3">
+                                    <label class="form-label">ราคาขายต่อหน่วย (ProductPrice)</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.ProductPrice" disabled>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">หน่วย (ProductUnitName)</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_Stock.ProductUnitName" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="SaveData()">บันทึก</button>
+            <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"
+                id="cdFullmodal" (click)="modal.close('Close click')"><i class="ri-close-line me-1 align-middle"></i>
+                ยกเลิก</a>
+        </div>
+    </div><!-- /.modal-content -->
+</ng-template><!-- /.modal-dialog -->
+
+
+<ng-template #addDeliveryDateModal let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalFullscreenLabel">วันที่ส่งมอบยา</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            (click)="modal.dismiss('Close click')"></button>
+        </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">วันที่ส่งมอบยา</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label">🧬 วันที่ส่งมอบยา</label>
+                                <input type="date" class="form-control" [(ngModel)]="DeliveryDrug.DeliveryDate">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">🧬 จำนวนยา</label>
+                                <input type="number" class="form-control" [(ngModel)]="DeliveryDrug.DeliveryQty">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-grid">
+                                    <button type="button" class="btn btn-primary" (click)="addDeliveryDate()">เพิ่มวันที่ส่งมอบยา</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped mb-0">
+                                        <thead>
+                                            <tr style="text-align: center;">
+                                                <th style="width: 10%;">ลำดับ</th>
+                                                <th style="width: 45%;">วันที่ส่งมอบยา</th>
+                                                <th style="width: 45%;">จำนวนยา</th>
+                                                <th style="width: 5%;">ลบ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (deliveryDateList.length === 0) {
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted">ยังไม่มีข้อมูลวันที่ส่งมอบยา</td>
+                                                </tr>
+                                            } @else {
+                                                @for (item of deliveryDateList; track $index) {
+                                                    <tr>
+                                                        <td style="text-align: center;">{{$index + 1}}</td>
+                                                        <td style="text-align: center;">{{item.DeliveryDate}}</td>
+                                                        <td style="text-align: right;">{{item.DeliveryQty | number}}</td>
+                                                        <td style="text-align: center;">
+                                                            <button type="button" class="btn btn-danger" (click)="deleteDeliveryDate($index)">
+                                                                <i class="ri-delete-bin-line me-1"></i>ลบ
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="saveDeliveryDate()">บันทึก</button>
+        <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"
+            id="cdFullmodal" (click)="modal.close('Close click')"><i class="ri-close-line me-1 align-middle"></i>
+            ยกเลิก</a>
+    </div>
+</div>
+</ng-template>

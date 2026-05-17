@@ -1,0 +1,95 @@
+<div class="auth-page d-flex align-items-center min-vh-100">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-10 col-xl-8">
+        <div class="card">
+          <div class="card-body p-4">
+            <div class="text-center mt-3 mb-4">
+              <h4 class="text-primary mb-3">ระบบจัดการสิทธิ์</h4>
+              <p class="text-muted fs-5">กรุณาเลือกสิทธิ์การเข้าถึงระบบ</p>
+            </div>
+
+
+            <!-- Network Status -->
+            <div *ngIf="!navigator.onLine" class="alert alert-warning" role="alert">
+              <i class="mdi mdi-wifi-off me-2"></i>
+              ไม่มีการเชื่อมต่ออินเทอร์เน็ต กรุณาตรวจสอบการเชื่อมต่อ
+            </div>
+
+            <!-- Error State -->
+            <div *ngIf="error" class="alert alert-danger" role="alert">
+              <i class="mdi mdi-alert-circle me-2"></i>
+              {{ error }}
+              <div class="mt-3">
+                <button type="button" class="btn btn-outline-danger btn-sm" (click)="retry()">
+                  <i class="mdi mdi-refresh me-1"></i>
+                  ลองใหม่อีกครั้ง
+                </button>
+              </div>
+            </div>
+
+            <!-- Permission Selection -->
+            <div *ngIf="!error && permissions.length > 0" class="mt-4">
+              <h5 class="mb-4 text-center">สิทธิ์การเข้าถึงที่สามารถใช้งานได้:</h5>
+              
+              <div class="row g-3">
+                <div *ngFor="let permission of getUniqueGroups()" class="col-12 col-md-6 col-lg-4 col-xl-3">
+                  <div class="card border h-100 permission-card">
+                    <div class="card-body p-3 d-flex flex-column">
+                      <div class="text-center mb-3">
+                        <i class="mdi mdi-account-group text-primary" style="font-size: 2.5rem;"></i>
+                      </div>
+                      <div class="flex-grow-1 text-center">
+                        <h6 class="mb-2 fw-bold">
+                          {{ permission.Group_Name }}
+                        </h6>
+                        <p class="text-muted mb-3 small">
+                          <i class="mdi mdi-office-building me-1"></i>
+                          {{ permission.Department_Name }}
+                        </p>
+                      </div>
+                      <button 
+                        type="button" 
+                        class="btn btn-primary btn-sm w-100"
+                        (click)="selectPermission(permission)"
+                        [disabled]="selectedGroup && selectedGroup.Group_Id === permission.Group_Id && selectedGroup.Department_id === permission.Department_id">
+                        <i class="mdi mdi-check me-1"></i>
+                        เลือกสิทธิ์นี้
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Selected Permission Info -->
+              <div *ngIf="selectedGroup" class="alert alert-info mt-4">
+                <div class="d-flex align-items-center">
+                  <i class="mdi mdi-check-circle me-3 fs-4"></i>
+                  <div>
+                    <strong>สิทธิ์ที่เลือก:</strong> {{ selectedGroup?.Group_Name }} - {{ selectedGroup?.Department_Name }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- No Permissions -->
+            <div *ngIf="!error && permissions.length === 0" class="text-center py-5">
+              <i class="mdi mdi-alert-circle text-warning" style="font-size: 4rem;"></i>
+              <h5 class="mt-4">ไม่พบสิทธิ์การเข้าถึง</h5>
+              <p class="text-muted fs-5">กรุณาติดต่อผู้ดูแลระบบ</p>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-5 text-center">
+              <p class="mb-0">
+                <small class="text-muted fs-6">
+                  ระบบจัดการสิทธิ์ - FDA Monitoring System
+                </small>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

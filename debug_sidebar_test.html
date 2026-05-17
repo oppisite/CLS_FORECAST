@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .debug-panel {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .debug-section {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .debug-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .debug-content {
+            font-family: monospace;
+            font-size: 12px;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .button.success {
+            background: #28a745;
+        }
+        .button.danger {
+            background: #dc3545;
+        }
+        .button.warning {
+            background: #ffc107;
+            color: black;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sidebar Debug Test</h1>
+    
+    <div class="debug-panel">
+        <div class="debug-title">Session Storage Check</div>
+        <div class="debug-section">
+            <button class="button" onclick="checkSessionStorage()">Check Session Storage</button>
+            <button class="button danger" onclick="clearSessionStorage()">Clear Session Storage</button>
+            <div id="sessionStatus"></div>
+            <div id="sessionContent" class="debug-content"></div>
+        </div>
+    </div>
+
+    <div class="debug-panel">
+        <div class="debug-title">Layout Check</div>
+        <div class="debug-section">
+            <button class="button" onclick="checkLayout()">Check Layout</button>
+            <div id="layoutStatus"></div>
+            <div id="layoutContent" class="debug-content"></div>
+        </div>
+    </div>
+
+    <div class="debug-panel">
+        <div class="debug-title">Sidebar Element Check</div>
+        <div class="debug-section">
+            <button class="button" onclick="checkSidebarElement()">Check Sidebar Element</button>
+            <div id="sidebarStatus"></div>
+            <div id="sidebarContent" class="debug-content"></div>
+        </div>
+    </div>
+
+    <div class="debug-panel">
+        <div class="debug-title">Menu Items Check</div>
+        <div class="debug-section">
+            <button class="button" onclick="checkMenuItems()">Check Menu Items</button>
+            <div id="menuStatus"></div>
+            <div id="menuContent" class="debug-content"></div>
+        </div>
+    </div>
+
+    <div class="debug-panel">
+        <div class="debug-title">Navigation Test</div>
+        <div class="debug-section">
+            <button class="button success" onclick="navigateToPages()">Navigate to /pages</button>
+            <button class="button warning" onclick="navigateToHome()">Navigate to /emonitor/Home</button>
+            <div id="navigationStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        function checkSessionStorage() {
+            const statusDiv = document.getElementById('sessionStatus');
+            const contentDiv = document.getElementById('sessionContent');
+            
+            try {
+                const userSession = sessionStorage.getItem('userSession');
+                const sidebarMenu = sessionStorage.getItem('sidebarMenu');
+                const selectedPermission = sessionStorage.getItem('selectedPermission');
+                const authToken = sessionStorage.getItem('authToken');
+                
+                const sessionData = {
+                    userSession: userSession ? JSON.parse(userSession) : null,
+                    sidebarMenu: sidebarMenu ? JSON.parse(sidebarMenu) : null,
+                    selectedPermission: selectedPermission ? JSON.parse(selectedPermission) : null,
+                    authToken: authToken
+                };
+                
+                if (userSession) {
+                    statusDiv.innerHTML = '<div class="status success">Session found</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status error">No session found</div>';
+                }
+                
+                contentDiv.textContent = JSON.stringify(sessionData, null, 2);
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">Error checking session: ' + error.message + '</div>';
+                contentDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        function clearSessionStorage() {
+            sessionStorage.clear();
+            document.getElementById('sessionStatus').innerHTML = '<div class="status warning">Session cleared</div>';
+            document.getElementById('sessionContent').textContent = 'Session storage cleared';
+        }
+
+        function checkLayout() {
+            const statusDiv = document.getElementById('layoutStatus');
+            const contentDiv = document.getElementById('layoutContent');
+            
+            try {
+                const layoutType = document.documentElement.getAttribute('data-layout');
+                const layoutMode = document.documentElement.getAttribute('data-bs-theme');
+                const layoutWidth = document.documentElement.getAttribute('data-layout-width');
+                const layoutPosition = document.documentElement.getAttribute('data-layout-position');
+                const sidebarColor = document.documentElement.getAttribute('data-sidebar');
+                const sidebarSize = document.documentElement.getAttribute('data-sidebar-size');
+                
+                const layoutData = {
+                    layoutType: layoutType,
+                    layoutMode: layoutMode,
+                    layoutWidth: layoutWidth,
+                    layoutPosition: layoutPosition,
+                    sidebarColor: sidebarColor,
+                    sidebarSize: sidebarSize
+                };
+                
+                if (layoutType === 'vertical') {
+                    statusDiv.innerHTML = '<div class="status success">Vertical layout detected</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status warning">Layout type: ' + layoutType + '</div>';
+                }
+                
+                contentDiv.textContent = JSON.stringify(layoutData, null, 2);
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">Error checking layout: ' + error.message + '</div>';
+                contentDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        function checkSidebarElement() {
+            const statusDiv = document.getElementById('sidebarStatus');
+            const contentDiv = document.getElementById('sidebarContent');
+            
+            try {
+                const sidebarElement = document.querySelector('app-sidebar');
+                const sidebarMenu = document.querySelector('.app-menu');
+                const navbarNav = document.getElementById('navbar-nav');
+                
+                const sidebarData = {
+                    sidebarElement: sidebarElement ? 'Found' : 'Not found',
+                    sidebarMenu: sidebarMenu ? 'Found' : 'Not found',
+                    navbarNav: navbarNav ? 'Found' : 'Not found',
+                    sidebarElementClasses: sidebarElement ? sidebarElement.className : 'N/A',
+                    sidebarMenuClasses: sidebarMenu ? sidebarMenu.className : 'N/A'
+                };
+                
+                if (sidebarElement) {
+                    statusDiv.innerHTML = '<div class="status success">Sidebar element found</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status error">Sidebar element not found</div>';
+                }
+                
+                contentDiv.textContent = JSON.stringify(sidebarData, null, 2);
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">Error checking sidebar: ' + error.message + '</div>';
+                contentDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        function checkMenuItems() {
+            const statusDiv = document.getElementById('menuStatus');
+            const contentDiv = document.getElementById('menuContent');
+            
+            try {
+                const sidebarElement = document.querySelector('app-sidebar');
+                let menuItems = [];
+                let menuItemsLength = 0;
+                
+                if (sidebarElement && sidebarElement.menuItems) {
+                    menuItems = sidebarElement.menuItems;
+                    menuItemsLength = sidebarElement.menuItems.length;
+                }
+                
+                const menuData = {
+                    menuItemsLength: menuItemsLength,
+                    menuItems: menuItems,
+                    hasMenuItems: menuItemsLength > 0
+                };
+                
+                if (menuItemsLength > 0) {
+                    statusDiv.innerHTML = '<div class="status success">Menu items found: ' + menuItemsLength + '</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status warning">No menu items found</div>';
+                }
+                
+                contentDiv.textContent = JSON.stringify(menuData, null, 2);
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">Error checking menu items: ' + error.message + '</div>';
+                contentDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        function navigateToPages() {
+            window.location.href = 'http://localhost:4200/pages';
+        }
+
+        function navigateToHome() {
+            window.location.href = 'http://localhost:4200/emonitor/Home';
+        }
+
+        // Auto-check on page load
+        window.onload = function() {
+            checkSessionStorage();
+            checkLayout();
+            checkSidebarElement();
+            checkMenuItems();
+        };
+    </script>
+</body>
+</html>

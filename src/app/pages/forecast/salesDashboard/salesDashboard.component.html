@@ -1,6 +1,6 @@
 <div class="dashboard-container">
     <!-- ===== Filters ===== -->
-    <section class="dashboard-filters dashboard-filters--sticky" role="region" aria-label="ตัวกรองข้อมูล">
+    <section class="dashboard-filters" role="region" aria-label="ตัวกรองข้อมูล">
       <!-- <div class="dashboard-filter-row">
           <div class="dashboard-field">
             <label>📅 ช่วงเวลา</label>
@@ -220,10 +220,10 @@
     <!-- ===== Trend Chart ===== -->
     <section class="dashboard-panel">
       <div class="dashboard-panel-head">
-        <h3>📈 ยอดใช้จริง vs พยากรณ์ (รายเดือน)</h3>
+        <h3>📈 การคาดการณ์ยอดใช้ยา</h3>
       </div>
       <div class="dashboard-panel-body">
-        <apx-chart role="img" aria-label="กราฟเปรียบเทียบยอดใช้จริงกับค่าพยากรณ์" #trendChart *ngIf="lineOptions"
+        <apx-chart role="img" aria-label="กราฟการคาดการณ์ยอดใช้ยา" #trendChart *ngIf="lineOptions"
           [series]="lineOptions!.series" [chart]="lineOptions!.chart" [dataLabels]="lineOptions!.dataLabels"
           [stroke]="lineOptions!.stroke" [xaxis]="lineOptions!.xaxis" [yaxis]="lineOptions!.yaxis"
           [grid]="lineOptions!.grid" [tooltip]="lineOptions!.tooltip" [legend]="lineOptions!.legend"
@@ -238,7 +238,7 @@
       <div class="col-xl-6">
         <div class="card">
           <div class="card-header">
-            <h5 class="card-title mb-0">กราฟปริมาณ</h5>
+            <h5 class="card-title mb-0">กราฟปริมาณยา(คงคลัง)</h5>
           </div>
           <div class="card-body">
             <apx-chart *ngIf="quantityBarChartOptions" 
@@ -262,7 +262,7 @@
       <div class="col-xl-6">
         <div class="card">
           <div class="card-header">
-            <h5 class="card-title mb-0">กราฟมูลค่า</h5>
+            <h5 class="card-title mb-0">กราฟมูลค่ายา(คงคลัง)</h5>
           </div>
           <div class="card-body">
             <apx-chart *ngIf="valueBarChartOptions" 
@@ -283,7 +283,62 @@
       </div>
     </div>
   
-    
+    <section class="dashboard-panel">
+      <div class="dashboard-panel-head d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <h3 class="mb-0">สรุปตามโรงพยาบาล</h3>
+        <div class="d-flex align-items-center gap-2">
+          <label for="search-hospital-summary" class="form-label mb-0 small">ค้นหา</label>
+          <input id="search-hospital-summary" type="text" class="form-control form-control-sm" style="min-width: 220px;"
+            [(ngModel)]="hospitalSummarySearch"
+            (ngModelChange)="onHospitalSummarySearchChange()"
+            placeholder="ชื่อโรงพยาบาล, ปริมาณ, มูลค่า..." />
+          <button type="button" class="btn btn-success btn-sm" (click)="downloadHospitalSummaryExcel()">
+            <i class="ri-file-excel-2-line me-1"></i>Download Excel
+          </button>
+        </div>
+      </div>
+      <div class="dashboard-panel-body dashboard-table-wrap">
+        <div class="table-responsive">
+          <table class="table table-gridjs mb-0">
+            <thead>
+              <tr>
+                <th style="width: 10%; text-align: center;">ลำดับ</th>
+                <th style="width: 50%; text-align: center;">โรงพยาบาล</th>
+                <th style="width: 20%; text-align: right;">ปริมาณ</th>
+                <th style="width: 20%; text-align: right;">มูลค่าทั้งหมด</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (griddataHospital.length === 0) {
+                <tr>
+                  <td colspan="4" class="text-center text-muted">ไม่พบข้อมูล</td>
+                </tr>
+              } @else {
+                @for (row of griddataHospital; track $index) {
+                  <tr>
+                    <td style="text-align: center;">{{ ((hospitalSummaryPage - 1) * hospitalSummaryPageSize) + $index + 1 }}</td>
+                    <td>{{ row.hospitalName }}</td>
+                    <td style="text-align: right;">{{ row.quantity | number:'1.0-2' }}</td>
+                    <td style="text-align: right;">{{ row.totalValue | number:'1.0-2' }}</td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-end mt-3" *ngIf="hospitalSummaryFilteredRows.length > hospitalSummaryPageSize">
+          <ngb-pagination
+            [collectionSize]="hospitalSummaryFilteredRows.length"
+            [page]="hospitalSummaryPage"
+            (pageChange)="onHospitalSummaryPageChange($event)"
+            [pageSize]="hospitalSummaryPageSize"
+            [maxSize]="5"
+            [rotate]="true"
+            [boundaryLinks]="true">
+          </ngb-pagination>
+        </div>
+      </div>
+    </section>
   
     <!-- ===== Actions ===== -->
     <!-- <section class="dashboard-panel">

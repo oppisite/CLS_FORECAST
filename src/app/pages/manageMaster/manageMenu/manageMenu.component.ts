@@ -64,6 +64,7 @@ export class manageMenuComponent {
 
         let model ={
             FUNC_CODE: "FUNC-GET_DATA_PERMISSION_MENU",
+            AUTHEN_INFORMATION: this.userData
           }
           var getData = this.consService.GatewayGetData(model);
           getData.subscribe((response: any) => {
@@ -116,7 +117,8 @@ export class manageMenuComponent {
         // โหลดข้อมูลเมนูที่กำหนดให้กลุ่มนี้
         let model ={
             FUNC_CODE: "FUNC-GET_DATA_PERMISSION_MENU_GROUP",
-            Group_Id: data.IDA
+            Group_Id: data.IDA,
+            AUTHEN_INFORMATION: this.userData
           }
           var getData = this.consService.GatewayGetData(model);
           getData.subscribe((response: any) => {
@@ -205,7 +207,8 @@ export class manageMenuComponent {
                 let model ={
                     FUNC_CODE: "FUNC-SAVE_DATA_PERMISSION_MENU",
                     Group_Permission: this.Group_Permission,
-                    List_permission_group: dataToSave
+                    List_permission_group: dataToSave,
+                    AUTHEN_INFORMATION: this.userData
                 }
                 var getData = this.consService.GatewayGetData(model);
                 getData.subscribe((response: any) => {

@@ -1,0 +1,120 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0 flex-grow-1">จัดการข้อมูลยา</h4>
+            </div><!-- end card header -->
+
+            <div class="card-body">
+                <br />
+                <div class="row">
+                    <div class="col-lg-4 text-right">
+                        <div class="search-box d-inline-block mb-2">
+                            <input type="text" class="form-control search" placeholder="Search..."
+                                [(ngModel)]="service.searchTerm">
+                            <i class="ri-search-line search-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-right">
+
+                    </div>
+                    <div class="col-lg-2" style="text-align: end;">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#exampleModalgrid" (click)="fullModal(fullDataModal,old_MAS_Product_SubGroup)">
+                            <i class="ri-add-line me-1"></i>เพิ่มกลุ่มยาย่อย
+                        </button>               
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-gridjs">
+                        <thead>
+                            <tr style="text-align: center;">
+                                <th style="width: 5%;">ลำดับ</th>
+                                <th class="sort" style="width: 75%;" (click)="onSort('SubGroupDrugName')">กลุ่มยาย่อย</th>
+                                <th style="width: 5%;">แก้ไข</th>
+                                <th style="width: 5%;">ลบ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for(data of griddata; track $index){
+                            <tr>
+                                <td style="text-align: center;">{{$index + 1}}</td>
+                                <td style="text-align: center;"><ngb-highlight [result]="data.SubGroupDrugName"
+                                        [term]="service.searchTerm">{{data.SubGroupDrugName}}</ngb-highlight></td>  
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModalgrid" (click)="fullModal(fullDataModal,data)">
+                                        แก้ไข
+                                    </button>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn btn-danger" (click)="deleteData(data)">
+                                        ลบ
+                                    </button>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row justify-content-md-between align-items-md-center">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+                            Showing
+                            {{service.startIndex}} to
+                            {{service.endIndex}} of {{service.totalRecords}}
+                            entries
+                        </div>
+                    </div>
+                    <!-- Pagination -->
+                    <div class="col-sm-12 col-md-5">
+                        <div class="text-md-right float-md-end gridjs-pagination">
+                            <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="service.page"
+                                [pageSize]="service.pageSize">
+                            </ngb-pagination>
+                        </div>
+                    </div>
+                    <!-- End Pagination -->
+                </div>
+            </div><!-- end card-body -->
+        </div><!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+
+<ng-template #fullDataModal let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalFullscreenLabel">กำหนดกลุ่มยาย่อย</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                (click)="modal.dismiss('Close click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <!-- <div class="card-header">
+                            <h5 class="card-title mb-0">จัดการกลุ่มยาย่อย</h5>
+                        </div> -->
+                        <div class="card-body">
+                            <!-- ฟอร์มเพิ่มเมนู -->
+                            <div class="row mb-8">
+                                <div class="col-md-8">
+                                    <label class="form-label">ชื่อกลุ่มยาย่อย:</label>
+                                    <input type="text" class="form-control" [(ngModel)]="MAS_Product_SubGroup.SubGroupDrugName" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="SaveData()">บันทึก</button>
+            <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"
+                id="cdFullmodal" (click)="modal.close('Close click')"><i class="ri-close-line me-1 align-middle"></i>
+                ยกเลิก</a>
+            <!-- <button type="button" class="btn btn-primary" (click)="SaveMas_Indicator()">บันทึก</button> -->
+        </div>
+    </div><!-- /.modal-content -->
+</ng-template><!-- /.modal-dialog -->

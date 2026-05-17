@@ -1,0 +1,218 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0 flex-grow-1">จัดการสัญญาส่งมอบยา</h4>
+            </div>
+
+            <div class="card-body">
+                <br />
+                <div class="row">
+                    <div class="col-lg-4 text-right">
+                        <div class="search-box d-inline-block mb-2">
+                            <input type="text" class="form-control search" placeholder="Search..."
+                                [(ngModel)]="service.searchTerm">
+                            <i class="ri-search-line search-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-right"></div>
+                    <div class="col-lg-2" style="text-align: end;">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#exampleModalgrid"
+                            (click)="fullModal(fullDataModal, old_Contract_DeliveryDrug)">
+                            <i class="ri-add-line me-1"></i>เพิ่มสัญญาส่งมอบยา
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-gridjs">
+                        <thead>
+                            <tr style="text-align: center;">
+                                <th style="width: 5%;">ลำดับ</th>
+                                <th class="sort" style="width: 75%;" (click)="onSort('Contract_Name')">ชื่อสัญญาส่งมอบยา</th>
+                                <th style="width: 10%;">แก้ไข</th>
+                                <th style="width: 10%;">ลบ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (data of griddata; track $index) {
+                                <tr>
+                                    <td style="text-align: center;">{{ $index + 1 }}</td>
+                                    <td style="text-align: center;">
+                                        <ngb-highlight [result]="data.Contract_Name" [term]="service.searchTerm">
+                                            {{ data.Contract_Name }}
+                                        </ngb-highlight>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                            data-bs-target="#exampleModalgrid" (click)="fullModal(fullDataModal, data)">
+                                            แก้ไข
+                                        </button>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <button type="button" class="btn btn-danger" (click)="deleteContract(data)">
+                                            ลบ
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row justify-content-md-between align-items-md-center">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+                            Showing {{ service.startIndex }} to {{ service.endIndex }} of {{ service.totalRecords }} entries
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-5">
+                        <div class="text-md-right float-md-end gridjs-pagination">
+                            <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="service.page"
+                                [pageSize]="service.pageSize">
+                            </ngb-pagination>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #fullDataModal let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">{{ title }}</h5>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Close click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">ข้อมูลสัญญา</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">ชื่อสัญญาส่งมอบยา <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" [(ngModel)]="Contract_DeliveryDrug.Contract_Name"
+                                placeholder="กรอกชื่อสัญญา" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">รายการส่งมอบยา</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3 align-items-end g-2">
+                        <div class="col-md-2">
+                            <label class="form-label">งวด <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" [(ngModel)]="DeliveryDrug.Period_Name"
+                                placeholder="เช่น งวด 1" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ยา <span class="text-danger">*</span></label>
+                            <ng-select [(ngModel)]="DeliveryDrug.ProductCode" [items]="LIST_MAS_DRUG"
+                                bindLabel="ProductTradeName" bindValue="ProductCode" [clearable]="false"
+                                [searchable]="true" (ngModelChange)="onChangeProductCode($event)"
+                                placeholder="--กรุณาเลือก--">
+                            </ng-select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">จำนวนที่ต้องส่งมอบ <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" [(ngModel)]="DeliveryDrug.DeliveryQty" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">จำนวนส่งมอบแล้ว <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" [(ngModel)]="DeliveryDrug.Fin_DeliveryQty" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">จำนวนค้างส่ง</label>
+                            <input type="number" class="form-control" [(ngModel)]="DeliveryDrug.Overdue_DeliveryQty" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">วันที่ส่งมอบยา</label>
+                            <input type="date" class="form-control" [(ngModel)]="DeliveryDrug.DeliveryDate">
+                        </div>
+                    </div>
+                    <div class="row mb-3 align-items-end g-2">
+                        <div class="col-md-10">
+                            <label class="form-label">ประมาณการส่งมอบ</label>
+                            <textarea class="form-control" rows="2" [(ngModel)]="DeliveryDrug.Delivery_Detail"
+                                placeholder="รายละเอียดประมาณการส่งมอบ"></textarea>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid gap-1">
+                                <button type="button" class="btn btn-primary" (click)="addOrUpdateDeliveryDrug()">
+                                    <i class="ri-add-line me-1"></i>{{ editingDeliveryIndex != null ? 'บันทึกรายการ' : 'เพิ่ม' }}
+                                </button>
+                                @if (editingDeliveryIndex != null) {
+                                    <button type="button" class="btn btn-light btn-sm" (click)="cancelEditDeliveryDrug()">
+                                        ยกเลิกแก้ไข
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped mb-0 table-sm">
+                            <thead>
+                                <tr style="text-align: center;">
+                                    <th>ลำดับ</th>
+                                    <th>ชื่อยา</th>
+                                    <th>งวด</th>
+                                    <th>วันที่ส่งมอบ</th>
+                                    <th>จำนวนที่ต้องส่งมอบ</th>
+                                    <th>จำนวนส่งมอบแล้ว</th>
+                                    <th>จำนวนค้างส่ง</th>
+                                    <th>ประมาณการส่งมอบ</th>
+                                    <th>แก้ไข</th>
+                                    <th>ลบ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (deliveryDrugList.length === 0) {
+                                    <tr>
+                                        <td colspan="10" class="text-center text-muted py-3">ยังไม่มีรายการส่งมอบยา</td>
+                                    </tr>
+                                } @else {
+                                    @for (item of deliveryDrugList; track $index) {
+                                        <tr [class.table-warning]="editingDeliveryIndex === $index">
+                                            <td class="text-center">{{ $index + 1 }}</td>
+                                            <td>{{ item.ProductTradeName }}</td>
+                                            <td class="text-center">{{ item.Period_Name }}</td>
+                                            <td class="text-center">{{ item.DeliveryDate }}</td>
+                                            <td class="text-end">{{ item.DeliveryQty | number }}</td>
+                                            <td class="text-end">{{ item.Fin_DeliveryQty | number }}</td>
+                                            <td class="text-end">{{ item.Overdue_DeliveryQty | number }}</td>
+                                            <td>{{ item.Delivery_Detail }}</td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-warning btn-sm"
+                                                    (click)="editDeliveryDrugFromList($index)">
+                                                    <i class="ri-edit-line"></i>
+                                                </button>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                    (click)="deleteDeliveryDrugFromList($index)">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="saveContractDeliveryDrug()">บันทึก</button>
+            <button type="button" class="btn btn-light" (click)="modal.close('Close click')">ยกเลิก</button>
+        </div>
+    </div>
+</ng-template>

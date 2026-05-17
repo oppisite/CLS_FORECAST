@@ -1,0 +1,362 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title mb-0 flex-grow-1">จัดการความต้องการ</h4>
+      </div>
+
+      <div class="card-body">
+
+        <div class="d-flex align-items-center gap-2">
+            <div class="col-lg-4 text-left mb-2">
+                <div class="col-md-4">
+                    <label>ปี</label>
+                    <ng-select
+                        [(ngModel)]="selectedYear"
+                        [items]="yearOptions"
+                        bindLabel="year"
+                        bindValue="year"
+                        [clearable]="false"
+                        [searchable]="true"
+                        (ngModelChange)="onChangeDemandDrugYear($event)"
+                        placeholder="--กรุณาเลือก--">
+                    </ng-select>
+                </div>
+            </div>
+            
+          </div>
+        <br />
+        <!-- Tabs + Year -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+
+          <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button
+              type="button"
+              class="nav-link"
+              [class.active]="demandTab === 'drug'"
+              (click)="switchDemandTab('drug')"
+            >
+              ความต้องการยา
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              type="button"
+              class="nav-link"
+              [class.active]="demandTab === 'hospital'"
+              (click)="switchDemandTab('hospital')"
+            >
+              ความต้องการของโรงพยาบาล
+            </button>
+          </li>
+          </ul>
+
+
+        </div>
+
+        <div class="tab-content p-3">
+          <!-- Tab: ความต้องการยา -->
+          @if (demandTab === 'drug') {
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+              <div>
+                <div class="fw-semibold">อัปโหลดไฟล์ Excel เพื่อบันทึก “ความต้องการยา”</div>
+                <div class="text-muted small">เลือกปีและอัปโหลดไฟล์ในหน้าต่างโมดัล</div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-success"
+                (click)="openUploadExcelModal(uploadDemandExcelModal, 'drug')"
+              >
+                <i class="ri-upload-2-line me-1"></i> อัปโหลด Excel
+              </button>
+
+            </div>
+
+            <div class="row mt-3 mb-2">
+              <div class="col-lg-4 text-right">
+                <div class="search-box d-inline-block mb-2">
+                  <input type="text" class="form-control search" placeholder="Search..." [(ngModel)]="service.searchTerm">
+                  <i class="ri-search-line search-icon"></i>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive mt-1">
+              <table class="table table-gridjs">
+                <thead>
+                  <tr style="text-align: center;">
+                    <th style="width: 10%;">ลำดับ</th>
+                    <th style="width: 10%;">ปี</th>
+                    <th style="width: 45%;">ชื่อไฟล์ในระบบ</th>
+                    <th style="width: 45%;">ชื่อไฟล์ที่อัพโหลด</th>
+                    <th style="width: 10%;">ดูรายละเอียด</th>
+                    <th style="width: 10%;">ลบ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (griddata.length === 0) {
+                    <tr>
+                      <td colspan="5" class="text-center text-muted">ไม่พบข้อมูลไฟล์อัปโหลด</td>
+                    </tr>
+                  } @else {
+                    @for (row of griddata; track $index) {
+                      <tr style="text-align: center;">
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ row.YEAR || '-' }}</td>
+                        <td>{{ row.NAME_FAKE || '-' }}</td>
+                        <td>{{ row.NAME_REAL || '-' }}</td>
+                        <td style="text-align: center;">
+                          <button type="button" class="btn btn-sm btn-outline-primary" style="width: 42px; height: 32px;"
+                            title="ดูรายละเอียด" (click)="openFileDetail(demandDrugDetailModal, row)">
+                            <i class="ri-eye-line"></i>
+                          </button>
+                        </td>
+                        <td style="text-align: center;">
+                          <button type="button" class="btn btn-sm btn-outline-danger" style="width: 42px; height: 32px;"
+                            title="ลบ" (click)="deleteFile(row)">
+                            <i class="ri-delete-bin-line"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+            <div class="row justify-content-md-between align-items-md-center">
+              <div class="col-sm-12 col-md-5">
+                <div class="dataTables_info mb-2" role="status" aria-live="polite">
+                  Showing {{service.startIndex}} to {{service.endIndex}} of {{service.totalRecords}} entries
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end gridjs-pagination">
+                  <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="service.page" [pageSize]="service.pageSize">
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+
+          }
+
+          <!-- Tab: ความต้องการของโรงพยาบาล -->
+          @if (demandTab === 'hospital') {
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+              <div>
+                <div class="fw-semibold">อัปโหลดไฟล์ Excel เพื่อบันทึก “ความต้องการของโรงพยาบาล”</div>
+                <div class="text-muted small">เลือกปีและอัปโหลดไฟล์ในหน้าต่างโมดัล</div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-success"
+                (click)="openUploadExcelModal(uploadDemandExcelModal, 'hospital')"
+              >
+                <i class="ri-upload-2-line me-1"></i> อัปโหลด Excel
+              </button>
+            </div>
+
+            <div class="row mt-3 mb-2">
+              <div class="col-lg-4 text-right">
+                <div class="search-box d-inline-block mb-2">
+                  <input type="text" class="form-control search" placeholder="Search..." [(ngModel)]="service.searchTerm">
+                  <i class="ri-search-line search-icon"></i>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive mt-1">
+              <table class="table table-gridjs">
+                <thead>
+                  <tr style="text-align: center;">
+                    <th style="width: 10%;">ลำดับ</th>
+                    <th style="width: 10%;">ปี</th>
+                    <th style="width: 45%;">ชื่อไฟล์ในระบบ</th>
+                    <th style="width: 45%;">ชื่อไฟล์ที่อัพโหลด</th>
+                    <th style="width: 10%;">ดูรายละเอียด</th>
+                    <th style="width: 10%;">ลบ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (griddata.length === 0) {
+                    <tr>
+                      <td colspan="5" class="text-center text-muted">ไม่พบข้อมูลไฟล์อัปโหลด</td>
+                    </tr>
+                  } @else {
+                    @for (row of griddata; track $index) {
+                      <tr style="text-align: center;">
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ row.YEAR || '-' }}</td>
+                        <td>{{ row.NAME_FAKE || '-' }}</td>
+                        <td>{{ row.NAME_REAL || '-' }}</td>
+                        <td style="text-align: center;">
+                          <button type="button" class="btn btn-sm btn-outline-primary" style="width: 42px; height: 32px;"
+                            title="ดูรายละเอียด" (click)="openFileDetail(demandDrugDetailModal, row)">
+                            <i class="ri-eye-line"></i>
+                          </button>
+                        </td>
+                        <td style="text-align: center;">
+                          <button type="button" class="btn btn-sm btn-outline-danger" style="width: 42px; height: 32px;"
+                            title="ลบ" (click)="deleteFile(row)">
+                            <i class="ri-delete-bin-line"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+            <div class="row justify-content-md-between align-items-md-center">
+              <div class="col-sm-12 col-md-5">
+                <div class="dataTables_info mb-2" role="status" aria-live="polite">
+                  Showing {{service.startIndex}} to {{service.endIndex}} of {{service.totalRecords}} entries
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end gridjs-pagination">
+                  <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="service.page" [pageSize]="service.pageSize">
+                  </ngb-pagination>
+                </div>
+              </div>
+            </div>
+            
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Excel Modal -->
+<ng-template #uploadDemandExcelModal let-modal>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">
+        อัปโหลดไฟล์ Excel - @if (demandTab === 'drug') { ความต้องการยา } @else { ความต้องการของโรงพยาบาล }
+      </h5>
+      <button
+        type="button"
+        class="btn-close"
+        (click)="modal.dismiss('Close click')"
+        aria-label="Close"
+      ></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">เลือกไฟล์ Excel</label>
+          <input
+            type="file"
+            class="form-control"
+            accept=".xls,.xlsx,.xlsm"
+            (change)="onExcelFileChange($event)"
+          />
+          <div class="text-muted small mt-1" *ngIf="excelFile">
+            ไฟล์ที่เลือก: {{ excelFile.name }}
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">หมายเหตุ</label>
+          <div class="text-muted small">
+            <a href="javascript:void(0)" class="text-primary" (click)="downloadTemplate()">
+              <i class="ri-download-line me-1"></i>ดาวน์โหลด Template Excel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="uploadDemandExcel()">อัปโหลด</button>
+      <a
+        href="javascript:void(0);"
+        class="btn btn-link link-success fw-medium"
+        (click)="modal.close('Close click')"
+      >
+        ยกเลิก
+      </a>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #demandDrugDetailModal let-modal>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">รายละเอียดข้อมูลยา</h5>
+      <button
+        type="button"
+        class="btn-close"
+        (click)="modal.dismiss('Close click')"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <div class="row mb-2">
+        <div class="col-lg-4 text-right">
+          <div class="search-box d-inline-block mb-2">
+            <input type="text" class="form-control search" placeholder="Search..."
+              [(ngModel)]="searchTermDetail" (ngModelChange)="onSearchDetail()">
+            <i class="ri-search-line search-icon"></i>
+          </div>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-gridjs">
+          <thead>
+            @if (demandTab === 'hospital') {
+              <tr style="text-align: center;">
+                <th class="sort" style="width: 70%;" (click)="onSortDetail('CustomerTypeName')">ประเภทสถานพยาบาล</th>
+                <th class="sort" style="width: 30%;" (click)="onSortDetail('QTY')">จำนวน</th>
+              </tr>
+            } @else {
+              <tr style="text-align: center;">
+                <th style="width: 10%;">ลำดับ</th>
+                <th class="sort" style="width: 55%;" (click)="onSortDetail('ProductTradeName')">ชื่อยา</th>
+                <th class="sort" style="width: 20%;" (click)="onSortDetail('QTY')">จำนวน</th>
+                <th class="sort" style="width: 15%;" (click)="onSortDetail('UNIT_NAME')">หน่วย</th>
+              </tr>
+            }
+          </thead>
+          <tbody>
+            @for (row of griddataDetail; track $index) {
+              <tr>
+                @if (demandTab === 'hospital') {
+                  <td><ngb-highlight [result]="row.CustomerTypeName || '-'"
+                      [term]="serviceDetail.searchTerm">{{ row.CustomerTypeName || '-' }}</ngb-highlight></td>
+                  <td style="text-align: right;"><ngb-highlight [result]="row.QTY || 0"
+                      [term]="serviceDetail.searchTerm">{{ row.QTY || 0 | number:'1.0-2' }}</ngb-highlight></td>
+                } @else {
+                  <td style="text-align: center;">{{ $index + 1 }}</td>
+                  <td><ngb-highlight [result]="row.ProductTradeName || '-'"
+                      [term]="serviceDetail.searchTerm">{{ row.ProductTradeName || '-' }}</ngb-highlight></td>
+                  <td style="text-align: right;"><ngb-highlight [result]="row.QTY || 0"
+                      [term]="serviceDetail.searchTerm">{{ row.QTY || 0 | number:'1.0-2' }}</ngb-highlight></td>
+                  <td style="text-align: center;"><ngb-highlight [result]="row.UNIT_NAME || '-'"
+                      [term]="serviceDetail.searchTerm">{{ row.UNIT_NAME || '-' }}</ngb-highlight></td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="row justify-content-md-between align-items-md-center">
+        <div class="col-sm-12 col-md-5">
+          <div class="dataTables_info mb-2" role="status" aria-live="polite">
+            Showing {{serviceDetail.startIndex}} to {{serviceDetail.endIndex}} of {{serviceDetail.totalRecords}} entries
+          </div>
+        </div>
+        <div class="col-sm-12 col-md-5">
+          <div class="text-md-right float-md-end gridjs-pagination">
+            <ngb-pagination [collectionSize]="(totalDetail$ | async)!" [(page)]="serviceDetail.page"
+              [pageSize]="serviceDetail.pageSize">
+            </ngb-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">ปิด</button>
+    </div>
+  </div>
+</ng-template>

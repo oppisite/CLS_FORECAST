@@ -49,7 +49,11 @@ import { CustomCaptchaComponent } from '../form/custom-capcha/custom-captcha.com
 
 import { manageMenuComponent } from './manageMenu/manageMenu.component';
 import { managePersonComponent } from './managePerson/mangaePerson.component';
+import { manageDrugComponent } from './manageDrug/manageDrug.component';
+import { manageSubGroupDrugComponent } from './manageSubGroupDrug/manageSubGroupDrug.component';
 import { ManageMasterRoutingModule } from './manageMaster-routing.module';
+import { manageEmailSendComponent } from './mangeEmailSend/manageEmailSend.component';
+import { manageDemandDrugComponent } from './manageDemandDrug/manageDemandDrug.component';
 const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
   url: 'https://httpbin.org/post',
   maxFilesize: 50,
@@ -59,7 +63,11 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
 @NgModule({
     declarations: [
         manageMenuComponent,
-        managePersonComponent
+        managePersonComponent,
+        manageDrugComponent,
+        manageSubGroupDrugComponent,
+        manageEmailSendComponent,
+        manageDemandDrugComponent
     ],
   imports: [
     CommonModule,

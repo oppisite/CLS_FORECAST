@@ -1,6 +1,6 @@
 <div class="dashboard-container">
   <!-- ===== Filters ===== -->
-  <section class="dashboard-filters dashboard-filters--sticky" role="region" aria-label="ตัวกรองข้อมูล">
+  <section class="dashboard-filters" role="region" aria-label="ตัวกรองข้อมูล">
     <!-- <div class="dashboard-filter-row">
         <div class="dashboard-field">
           <label>📅 ช่วงเวลา</label>
@@ -91,6 +91,12 @@
         </ng-select>
       </div>
       <div class="dashboard-field">
+        <label>📅 จำนวนเดือน Forecast</label>
+        <input type="number" class="form-control" [(ngModel)]="forecastMonths"
+               (change)="onForecastMonthsChange()" min="1" max="60"
+               style="width:100px;" placeholder="เดือน" />
+      </div>
+      <div class="dashboard-field">
           <label>🏥 ภูมิภาค</label>
           <ng-select [(ngModel)]="regionId" (change)="chg_region()" [clearable]="false" placeholder="--กรุณาเลือก--"
             [searchable]="true" [internalSearch]="false" [dropdownPosition]="'auto'" [appendTo]="'body'"
@@ -111,8 +117,6 @@
               {{item.Health_District_Name}}
             </ng-option>
           </ng-select>
-      </div>
-      <div class="dashboard-field">
       </div>
       <div class="dashboard-field">
         <label>🏥 ประเภทสถานพยาบาล</label>
@@ -154,14 +158,11 @@
           <ng-option *ngFor="let g of filteredDrugs" [value]="g.ProductCode">{{ g.ProductTradeName }}</ng-option>
         </ng-select>
       </div>
-      <div class="dashboard-field">
-      </div>
-      <div class="dashboard-field">
-      </div>
-      <div class="dashboard-field">
-      </div>
-      <div class="dashboard-field" style="display: flex; justify-content: flex-end;">
-        <input type="button" class="dashboard-btn" value="ค้นหา" (click)="searchPayOrder()">
+      <div class="dashboard-field dashboard-filter-actions">
+        <div class="dashboard-filter-actions-row">
+          <input type="button" class="dashboard-btn dashboard-btn-secondary" value="เคลียร์ตัวกรอง" (click)="clearFilters()">
+          <input type="button" class="dashboard-btn" value="ค้นหา" (click)="searchPayOrder()">
+        </div>
       </div>
     </div>
 
@@ -172,37 +173,56 @@
     <div class="dashboard-kpi-card dashboard-kpi-card-risk">
       <div class="dashboard-kpi-title">
         <div class="risk-title-left">
-          <span class="risk-icon">⚠️</span> <span class="risk-title-text">ยาเสี่ยงขาด</span>
+          <span class="risk-icon">⚠️</span> <span class="risk-title-text">ยาใกล้ขาดคราว</span>
         </div>
         <button type="button" class="btn btn-sm btn-outline-danger risk-email-btn" (click)="sendEmailRisk()" title="ส่งอีเมลแจ้งเตือน">
           <i class="ri-mail-line me-1"></i> ส่ง Email
         </button>
       </div>
       <div class="dashboard-kpi-value">{{ kpis.stockRiskCount }} <span class="value-unit">รายการ</span></div>
-      <div class="dashboard-kpi-sub">DOH ต่ำกว่า ROP</div>
+      <div class="dashboard-kpi-sub">วันคงเหลือ(DOH) ต่ำกว่า จุดสั่งซื้อ(ROP)</div>
     </div>
     <div class="dashboard-kpi-card">
-      <div class="dashboard-kpi-title">📊 DOH เฉลี่ย</div>
+      <div class="dashboard-kpi-title">📊 วันคงเหลือ(DOH) เฉลี่ย</div>
       <div class="dashboard-kpi-value">{{ kpis.avgDOH | number: '1.0-1' }}</div>
-      <div class="dashboard-kpi-sub">วันคงเหลือเฉลี่ย</div>
+      <div class="dashboard-kpi-sub">วันคงเหลือ(DOH) เฉลี่ย</div>
     </div>
-    <div class="dashboard-kpi-card">
+    <div class="dashboard-kpi-card"
+      role="button"
+      tabindex="0"
+      (click)="focusRiskTable()"
+      (keydown.enter)="focusRiskTable()"
+      (keydown.space)="focusRiskTable()">
       <div class="dashboard-kpi-title">⏰ ใกล้หมดอายุ</div>
       <div class="dashboard-kpi-value">
-        {{ kpis.nearExpiry.d30 }}/{{ kpis.nearExpiry.d60 }}/{{ kpis.nearExpiry.d90 }}
+        {{ kpis.nearExpiry.d180 }}/{{ kpis.nearExpiry.d270 }}/{{ kpis.nearExpiry.d360 }}
       </div>
-      <div class="dashboard-kpi-sub">≤30 / 60 / 90 วัน</div>
+      <div class="dashboard-kpi-sub">≤180 / <=270 / <=360 วัน</div>
     </div>
     <div class="dashboard-kpi-card">
-      <div class="dashboard-kpi-title">📦 ผลรวมปริมาณ</div>
+      <div class="dashboard-kpi-title">📦 คงคลังยา</div>
       <div class="dashboard-kpi-value">{{ kpis.totalQuantity | number: '1.0-0' }}</div>
       <div class="dashboard-kpi-sub">จำนวนรวมทั้งหมด</div>
     </div>
     <div class="dashboard-kpi-card">
-      <div class="dashboard-kpi-title">💰 ผลรวมราคา</div>
+      <div class="dashboard-kpi-title">💰 มูลค่าคงคลังยา</div>
       <div class="dashboard-kpi-value">{{ kpis.totalValue | number: '1.0-0' }}</div>
       <div class="dashboard-kpi-sub">มูลค่ารวม (บาท)</div>
     </div>
+    <!-- <div class="dashboard-kpi-card">
+      <div class="dashboard-kpi-title">📊 MAPE/WAPE</div>
+      <div class="dashboard-kpi-value">
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 24px; font-weight: 700;">{{ kpis.forecastAccuracyPrevMonth.mape | number: '1.2-2' }}%</span>
+          <span style="font-size: 14px; color: #94a3b8; margin-left: 4px;">MAPE</span>
+        </div>
+        <div>
+          <span style="font-size: 24px; font-weight: 700;">{{ kpis.forecastAccuracyPrevMonth.wape | number: '1.2-2' }}%</span>
+          <span style="font-size: 14px; color: #94a3b8; margin-left: 4px;">WAPE</span>
+        </div>
+      </div>
+      <div class="dashboard-kpi-sub">ความแม่นยำการคาดการณ์</div>
+    </div> -->
     <!-- <div class="dashboard-kpi-card">
         <div class="dashboard-kpi-title">📋 คำขอซื้อ (รอ/อนุมัติ)</div>
         <div class="dashboard-kpi-value">
@@ -227,11 +247,19 @@
 
   <!-- ===== Trend Chart ===== -->
   <section class="dashboard-panel">
-    <div class="dashboard-panel-head">
-      <h3>📈 ยอดใช้จริง vs พยากรณ์ (รายเดือน)</h3>
+    <div class="dashboard-panel-head d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <h3 class="mb-0">📈 การคาดการณ์ยอดใช้ยา</h3>
+      <div class="d-flex align-items-center gap-2">
+        <label for="forecast-adjust-pct" class="form-label mb-0 small">ปรับการคาดการณ์ (%)</label>
+        <input id="forecast-adjust-pct" type="number" class="form-control form-control-sm"
+               style="width: 110px;" step="1"
+               [(ngModel)]="forecastAdjustmentPercent"
+               (ngModelChange)="onForecastAdjustmentChange()"
+               placeholder="เช่น 10 หรือ -5" />
+      </div>
     </div>
     <div class="dashboard-panel-body">
-      <apx-chart role="img" aria-label="กราฟเปรียบเทียบยอดใช้จริงกับค่าพยากรณ์" #trendChart *ngIf="lineOptions"
+      <apx-chart role="img" aria-label="กราฟการคาดการณ์ยอดใช้ยา" #trendChart *ngIf="lineOptions"
         [series]="lineOptions!.series" [chart]="lineOptions!.chart" [dataLabels]="lineOptions!.dataLabels"
         [stroke]="lineOptions!.stroke" [xaxis]="lineOptions!.xaxis" [yaxis]="lineOptions!.yaxis"
         [grid]="lineOptions!.grid" [tooltip]="lineOptions!.tooltip" [legend]="lineOptions!.legend"
@@ -240,23 +268,151 @@
     </div>
   </section>
 
-  <div class="dashboard-grid-2">
-    <!-- ===== Top Stock Risk ===== -->
+  <section class="dashboard-panel">
+    <div class="dashboard-panel-head d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <h3 class="mb-0">📦 แผนแบ่งงวดการส่งยา</h3>
+      <div class="d-flex align-items-center gap-2">
+        <label for="installment-count" class="form-label mb-0 small">จำนวนงวด</label>
+        <input id="installment-count" type="number" class="form-control form-control-sm"
+               style="width: 100px;" min="1" max="24"
+               [(ngModel)]="installmentCount"
+               (change)="onInstallmentCountChange()"
+               placeholder="เช่น 4" />
+      </div>
+    </div>
+    <div class="dashboard-panel-body dashboard-table-wrap">
+      <div class="table-responsive">
+        <table class="table table-gridjs mb-0">
+          <thead>
+            <tr>
+              <th style="width: 10%; text-align: center;">งวดที่</th>
+              <th style="width: 20%; text-align: center;">ช่วงเดือนที่ครอบคลุม</th>
+              <th style="width: 15%; text-align: center;">สต็อกพอไหม</th>
+              <th style="width: 15%; text-align: center;">เดือนเริ่มขาด</th>
+              <th style="width: 20%; text-align: center;">ควรส่งก่อนเดือน</th>
+              <th style="width: 20%; text-align: right;">ยอดแนะนำต่องวด</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (installmentPlan.length === 0) {
+              <tr>
+                <td colspan="6" class="text-center text-muted">ยังไม่มีข้อมูล forecast สำหรับคำนวณงวด</td>
+              </tr>
+            } @else {
+              @for (item of installmentPlan; track $index) {
+                <tr>
+                  <td style="text-align: center;">{{ item.round }}</td>
+                  <td style="text-align: center;">{{ item.startLabel }} - {{ item.endLabel }}</td>
+                  <td style="text-align: center;" [class.text-success]="item.stockEnough" [class.text-danger]="!item.stockEnough">
+                    {{ item.stockEnough ? 'พอ' : 'ไม่พอ' }}
+                  </td>
+                  <td style="text-align: center;">{{ item.shortageAt }}</td>
+                  <td style="text-align: center;">{{ item.recommendBefore }}</td>
+                  <td style="text-align: right;">{{ item.qty | number:'1.0-2' }}</td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+    <!-- ===== Trend Chart ===== -->
     <section class="dashboard-panel">
-      <div class="dashboard-panel-head">
-        <h3>⚠️ ยาเสี่ยงขาด</h3>
+      <div class="dashboard-panel-head d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <h3 class="mb-0">รายการยา</h3>
+        <div class="d-flex align-items-center gap-2">
+          <label for="search-use-drug" class="form-label mb-0 small">ค้นหา</label>
+          <input id="search-use-drug" type="text" class="form-control form-control-sm" style="min-width: 180px;"
+            [(ngModel)]="searchTermUseDrug"
+            (ngModelChange)="onSearchUseDrug()"
+            placeholder="ชื่อยา, รหัส, เดือน..." />
+          <button type="button" class="btn btn-success btn-sm" (click)="downloadUseDrugExcel()">
+            <i class="ri-file-excel-2-line me-1"></i>Download Excel
+          </button>
+        </div>
       </div>
       <div class="dashboard-panel-body dashboard-table-wrap">
         <div class="table-responsive">
           <table class="table table-gridjs">
             <thead>
               <tr>
-                <th style="width: 15%; text-align: center;">ชื่อการค้า</th>
-                <th style="width: 5%; text-align: center;">SOH</th>
-                <th style="width: 5%; text-align: center;">DOH</th>
-                <th style="width: 5%; text-align: center;">ROP</th>
-                <th style="width: 5%; text-align: center;">จำนวนที่ใช้ต่อวัน</th>
-                <th style="width: 5%; text-align: center;">รายละเอียด</th>
+                <th class="sort" style="width: 15%; text-align: center;" (click)="onSort('useDrug', 'ProductTradeName')">ชื่อยา</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'Po_Month')">เดือน</th>
+               
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'Qty_Y1')">ยอดใช้ยาย้อนหลัง 1 ปี</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'Qty_Y2')">ยอดใช้ยาย้อนหลัง 2 ปี</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'Qty_Y3')">ยอดใช้ยาย้อนหลัง 3 ปี</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'MA_Y1')">Moving average ย้อนหลัง 1 ปี</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'MA_Y2')">Moving average ย้อนหลัง 2 ปี</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'MA_Y3')">Moving average ย้อนหลัง 3 ปี</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'SeasonRatioY1')">Season ratio ของย้อนหลัง 1 ปี</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'SeasonRatioY2')">Season ratio ของย้อนหลัง 2 ปี</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'SeasonRatioY3')">Season ratio ของย้อนหลัง 3 ปี</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'SeasonIndex')">Season index</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'Useavg12')">จำนวนยอดใช้เฉลี่ย</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('useDrug', 'Forecast')">คาดการณ์ยอดใช้ยาปีนี้</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(data of (gridjsListUseDrug$ | async) ?? []; track $index) {
+              <tr>
+                <td><ngb-highlight [result]="data.ProductTradeName">{{data.ProductTradeName}}</ngb-highlight></td>
+                <td style="text-align: center;"><ngb-highlight [result]="data.Po_Month">{{data.Po_Month | number:'1.0-0'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.Qty_Y1">{{data.Qty_Y1 | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.Qty_Y2">{{data.Qty_Y2 | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.Qty_Y3">{{data.Qty_Y3 | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.MA_Y1">{{data.MA_Y1 | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.MA_Y2">{{data.MA_Y2 | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.MA_Y3">{{data.MA_Y3 | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.SeasonRatioY1">{{data.SeasonRatioY1 | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.SeasonRatioY2">{{data.SeasonRatioY2 | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.SeasonRatioY3">{{data.SeasonRatioY3 | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.SeasonIndex">{{data.SeasonIndex | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.Useavg12">{{data.Useavg12 | number:'1.0-2'}}</ngb-highlight></td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.Forecast">{{data.Forecast | number:'1.0-2'}}</ngb-highlight></td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="row justify-content-md-between align-items-md-center">
+          <div class="col-sm-12 col-md-5">
+            <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+              Showing {{serviceUseDrug.startIndex}} to {{serviceUseDrug.endIndex}} of {{serviceUseDrug.totalRecords}} entries
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-5">
+            <div class="text-md-right float-md-end gridjs-pagination">
+              <ngb-pagination [collectionSize]="(totalUseDrug$ | async)!" [(page)]="serviceUseDrug.page" [pageSize]="serviceUseDrug.pageSize" [maxSize]="7">
+              </ngb-pagination>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  <div class="dashboard-grid-2">
+    <!-- ===== Top Stock Risk ===== -->
+    <section class="dashboard-panel" #riskTableSection tabindex="-1">
+      <div class="dashboard-panel-head d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <h3>⚠️ ยาใกล้ขาดคราว</h3>
+        <button type="button" class="btn btn-success btn-sm" (click)="downloadRiskExcel()">
+          <i class="ri-file-excel-2-line me-1"></i>Download Excel
+        </button>
+      </div>
+      <div class="dashboard-panel-body dashboard-table-wrap">
+        <div class="table-responsive">
+          <table class="table table-gridjs">
+            <thead>
+              <tr>
+                <th class="sort" style="width: 15%; text-align: center;" (click)="onSort('risk', 'productName')">ชื่อการค้า</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('risk', 'soh')">สต็อกคงเหลือ(SOH)</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('risk', 'doh')">วันคงเหลือ(DOH)</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('risk', 'rop')">จุดสั่งซื้อ(ROP)</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('risk', 'SafetyStock')">ความปลอดภัย(Safety Stock)</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('risk', 'avgDailyUse')">จำนวนที่ใช้ต่อวัน</th>
+                <th class="sort" style="width: 5%; text-align: center;">รายละเอียด</th>
                 <!-- <th style="width: 5%;">ดูรายละเอียด</th> -->
               </tr>
             </thead>
@@ -272,6 +428,8 @@
                 <td style="text-align: right;"><ngb-highlight [result]="data.rop">{{data.rop |
                     number:'1.0-0'}}</ngb-highlight>
                 </td>
+                <td style="text-align: right;"><ngb-highlight [result]="data.SafetyStock">{{data.SafetyStock |
+                    number:'1.0-0'}}</ngb-highlight></td>
                 <td style="text-align: right;"><ngb-highlight [result]="data.avgDailyUse">{{data.avgDailyUse |
                     number:'1.0-0'}}</ngb-highlight></td>
                 <td style="text-align: center;">
@@ -297,7 +455,7 @@
           <div class="col-sm-12 col-md-5">
             <div class="text-md-right float-md-end gridjs-pagination">
               <ngb-pagination [collectionSize]="(totalRisk$ | async)!" [(page)]="serviceRisk.page"
-                [pageSize]="serviceRisk.pageSize">
+                [pageSize]="serviceRisk.pageSize" [maxSize]="7">
               </ngb-pagination>
             </div>
           </div>
@@ -308,8 +466,11 @@
 
     <!-- ===== Near Expiry ===== -->
     <section class="dashboard-panel">
-      <div class="dashboard-panel-head">
+      <div class="dashboard-panel-head d-flex flex-wrap align-items-center justify-content-between gap-2">
         <h3>⏰ ยาที่ใกล้หมดอายุ</h3>
+        <button type="button" class="btn btn-success btn-sm" (click)="downloadNearExpiryExcel()">
+          <i class="ri-file-excel-2-line me-1"></i>Download Excel
+        </button>
       </div>
       <div class="dashboard-panel-body dashboard-table-wrap">
         <div class="table-responsive">
@@ -317,11 +478,11 @@
             <thead>
               <tr>
                 <!-- <th style="width: 5%; text-align: center;">รหัส</th> -->
-                <th style="width: 15%; text-align: center;">ชื่อการค้า</th>
-                <th style="width: 5%; text-align: center;">LOT</th>
-                <th style="width: 5%; text-align: center;">วันหมดอายุ</th>
-                <th style="width: 5%; text-align: center;">หมดอายุ</th>
-                <th style="width: 10%; text-align: center;">จำนวน</th>
+                <th class="sort" style="width: 15%; text-align: center;" (click)="onSort('nearExpiry', 'productName')">ชื่อการค้า</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('nearExpiry', 'lot')">LOT</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('nearExpiry', 'exp_date')">วันหมดอายุ</th>
+                <th class="sort" style="width: 5%; text-align: center;" (click)="onSort('nearExpiry', 'daysToExpire')">วันที่เหลือก่อนหมดอายุ</th>
+                <th class="sort" style="width: 10%; text-align: center;" (click)="onSort('nearExpiry', 'currentStock')">จำนวน</th>
                 <!-- <th style="width: 5%; text-align: center;">รายละเอียด</th> -->
                 <!-- <th style="width: 5%;">ดูรายละเอียด</th> -->
               </tr>
@@ -338,7 +499,7 @@
                     date:'dd/MM/yyyy'}}</ngb-highlight></td>
                 <td style="text-align: right;"><ngb-highlight [result]="data.daysToExpire">{{data.daysToExpire |
                     number:'1.0-0' }} วัน</ngb-highlight></td>
-                <td style="text-align: right;"><ngb-highlight [result]="data.quantity">{{data.currentStock |
+                <td style="text-align: right;"><ngb-highlight [result]="data.currentStock">{{data.currentStock |
                     number:'1.0-0'}} {{data.unit}}</ngb-highlight></td>
                 <!-- <td style="text-align: center;">
                         <i style="color: rgb(57, 31, 173); font-size: 25px;" class="ri-search-line" title="ดูข้อมูล"
@@ -363,7 +524,7 @@
           <div class="col-sm-12 col-md-5">
             <div class="text-md-right float-md-end gridjs-pagination">
               <ngb-pagination [collectionSize]="(totalNearExpiry$ | async)!" [(page)]="serviceNearExpiry.page"
-                [pageSize]="serviceNearExpiry.pageSize">
+                [pageSize]="serviceNearExpiry.pageSize" [maxSize]="7">
               </ngb-pagination>
             </div>
           </div>
@@ -465,7 +626,7 @@
                 <div class="col-sm-12 col-md-5">
                   <div class="text-md-right float-md-end gridjs-pagination">
                     <ngb-pagination [collectionSize]="(totalNearExpiry$ | async)!" [(page)]="serviceNearExpiry.page"
-                      [pageSize]="serviceNearExpiry.pageSize">
+                      [pageSize]="serviceNearExpiry.pageSize" [maxSize]="7">
                     </ngb-pagination>
                   </div>
                 </div>

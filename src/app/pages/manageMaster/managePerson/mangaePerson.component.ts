@@ -165,6 +165,30 @@ export class managePersonComponent {
     }
 
     saveGroupPermission() {
+        const name = (this.Mas_Personal?.NAME ?? '').toString().trim();
+        const identify = (this.Mas_Personal?.IDENTIFY ?? '').toString().trim();
+
+        if (!name) {
+            Swal.fire({
+                title: 'แจ้งเตือน!',
+                text: 'กรุณากรอกชื่อผู้ใช้งาน',
+                icon: 'warning',
+                confirmButtonColor: 'rgb(3, 142, 220)',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        if (!identify || identify.length !== 13) {
+            Swal.fire({
+                title: 'แจ้งเตือน!',
+                text: 'กรุณากรอกเลขประจำตัวประชาชน 13 หลัก',
+                icon: 'warning',
+                confirmButtonColor: 'rgb(3, 142, 220)',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
         Swal.fire({
             title: 'ยืนยันการบันทึก',
             text: 'คุณต้องการบันทึกข้อมูลหรือไม่?',
@@ -174,21 +198,27 @@ export class managePersonComponent {
             confirmButtonText: 'บันทึก'
         }).then((result) => {
             if (result.isConfirmed) {
-                // สร้างข้อมูลสำหรับส่งไป API โดยเอา isTitle และ GroupMenuName ออก
-                const dataToSave = this.List_Personal_Group_Permission.map(item => ({
+                // ส่งฟิลด์ตามตาราง: NAME, IDENTIFY และ IDA (ถ้าเป็นการแก้ไข)
+                const masPersonal = {
+                    NAME: name,
+                    IDENTIFY: identify,
+                    ...(this.Mas_Personal?.IDA != null && this.Mas_Personal?.IDA !== '' && { IDA: this.Mas_Personal.IDA })
+                };
+
+                const dataToSave = this.List_Personal_Group_Permission.map((item: any) => ({
                     Group_Id: item.Group_Id,
                     Group_Name: item.Group_Name,
                     AUTHEN_INFORMATION: this.userData
                 }));
-                
-                let model ={
-                    FUNC_CODE: "FUNC-SAVE_DATA_PERSONAL_PERMISSION",
-                    MAS_PERSONAL: this.Mas_Personal,
+
+                const model = {
+                    FUNC_CODE: 'FUNC-SAVE_DATA_PERSONAL_PERMISSION',
+                    AUTHEN_INFORMATION: this.userData,
+                    MAS_PERSONAL: masPersonal,
                     List_Personal_Group_Permission: dataToSave
-                }
-                var getData = this.consService.GatewayGetData(model);
+                };
+                const getData = this.consService.GatewayGetData(model);
                 getData.subscribe((response: any) => {
-                    //debugger;
                     if (response.RESULT == null) {
                         Swal.fire({
                             title: 'สำเร็จ!',
@@ -199,7 +229,7 @@ export class managePersonComponent {
                         });
                         this.ngOnInit();
                         this.close_modal();
-                    }else{
+                    } else {
                         Swal.fire({
                             title: 'เกิดข้อผิดพลาด!',
                             text: response.RESULT,
@@ -211,8 +241,6 @@ export class managePersonComponent {
                 });
             }
         });
-
-
     }
     // ลบเมนู
     removeGroupPermission(index: number) {

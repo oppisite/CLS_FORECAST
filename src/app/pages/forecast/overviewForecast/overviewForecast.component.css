@@ -131,6 +131,19 @@ th {
     grid-template-columns: repeat(4, minmax(180px, 1fr));
 }
 
+.dashboard-filter-actions {
+    grid-column: 1 / -1;
+}
+
+.dashboard-filter-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
 .dashboard-field {
     display: flex;
     flex-direction: column;
@@ -695,6 +708,19 @@ th {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     background: linear-gradient(135deg, #0f172a, #020617);
     filter: brightness(1.1);
+}
+
+.dashboard-btn-secondary {
+    background: #fff;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-btn-secondary:hover {
+    background: #f8fafc;
+    color: #0f172a;
+    border-color: #94a3b8;
 }
 
 .dashboard-btn-link {

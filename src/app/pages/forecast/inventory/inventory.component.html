@@ -5,7 +5,7 @@
         <div class="col-xl-6">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">ตรวจสอบสต็อกคงเหลือเทียบ ROP</h5>
+                    <h5 class="card-title mb-0">ตรวจสอบสต็อกคงเหลือเทียบ จุดสั่งซื้อ(ROP)</h5>
                 </div>
                 <div class="card-body">
                     <apx-chart *ngIf="stockRopChartOptions" 
@@ -136,13 +136,13 @@
                                     <th class="sort" style="width: 20%; text-align: center;" (click)="onSort('ProductTradeName')">ชื่อการค้า</th>
                                     <th class="sort" style="width: 15%; text-align: center;" (click)="onSort('ProductTypeName')">ประเภทยา</th>
                                     <th class="sort" style="width: 15%; text-align: center;" (click)="onSort('NarcoticGroupName')">กลุ่มยา</th>
-                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('rop')">ROP</th>
-                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('dop')">DOP</th>
-                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('soh')">จำนวนยา</th>
+                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('rop')">จุดสั่งซื้อ(ROP)</th>
+                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('dop')">วันคงเหลือ(DOH)</th>
+                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('soh')">สต็อกคงเหลือ(SOH)</th>
                                     <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('daily_use')">จำนวนที่ใช้ต่อวัน</th>
-                                    <th class="sort" style="width: 10%; text-align: center;" (click)="onSort('pricePerUnit')">ราคาต่อหน่วย</th>
-                                    <th class="sort" style="width: 10%; text-align: center;" (click)="onSort('totalPricePerUnit')">ราคารวมต่อหน่วย</th>
-                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('ProductUnitName')">หน่วย</th>
+                                    <th class="sort" style="width: 10%; text-align: center;" (click)="onSort('pricePerUnit')">ราคาต่อหน่วยยา</th>
+                                    <th class="sort" style="width: 10%; text-align: center;" (click)="onSort('totalPricePerUnit')">ราคารวมต่อหน่วยยา</th>
+                                    <th class="sort" style="width: 8%; text-align: center;" (click)="onSort('ProductUnitName')">หน่วยยา</th>
                                 </tr>
                             </thead>
                             <tbody>

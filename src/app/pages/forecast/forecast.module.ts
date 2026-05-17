@@ -54,6 +54,7 @@ import { DashboardForecastComponent } from './dashboard/dashboard.component';
 import { OverviewForecastComponent } from './overviewForecast/overviewForecast.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { SalesDashboardComponent } from './salesDashboard/salesDashboard.component';
+import { DeliveryDateForecastComponent } from './deliveryDateForecast/deliveryDateForecast.component';
 const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
   url: '#', // URL หลอก (จำเป็นต้องมี)
   autoProcessQueue: false, // ห้ามประมวลผลคิวโดยอัตโนมัติ (สำคัญมาก)
@@ -68,7 +69,8 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
     DashboardForecastComponent,
     OverviewForecastComponent,
     InventoryComponent,
-    SalesDashboardComponent
+    SalesDashboardComponent,
+    DeliveryDateForecastComponent
   ],
   imports: [
     CommonModule,

@@ -4,6 +4,7 @@ import { DashboardForecastComponent } from './dashboard/dashboard.component';
 import { OverviewForecastComponent } from './overviewForecast/overviewForecast.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { SalesDashboardComponent } from './salesDashboard/salesDashboard.component';
+import { DeliveryDateForecastComponent } from './deliveryDateForecast/deliveryDateForecast.component';
 
 const routes: Routes = [
     { path: '', component: OverviewForecastComponent },
@@ -11,6 +12,7 @@ const routes: Routes = [
     { path: 'overview', component: OverviewForecastComponent },
     { path: 'inventory', component: InventoryComponent },
     { path: 'salesDashboard', component: SalesDashboardComponent },
+    { path: 'deliveryDateForecast', component: DeliveryDateForecastComponent },
 ];
 
 @NgModule({

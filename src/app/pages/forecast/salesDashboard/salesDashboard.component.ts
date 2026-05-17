@@ -14,6 +14,7 @@ import { GridJsModel } from '../../tables/gridjs/gridjs.model';
 import { DecimalPipe } from '@angular/common';
 import { get } from 'lodash';
 import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
 import { ConsService } from 'src/app/core/services/cons.service';
 import { DropzoneComponent, DropzoneDirective } from 'ngx-dropzone-wrapper';
 import { AuthenticationService } from 'src/app/core/services/auth.service';
@@ -222,6 +223,12 @@ export class SalesDashboardComponent {
     gridjsListDrugCustomer$!: Observable<GridJsModel[]>;
     totalDrugCustomer$: Observable<number>;
     griddataDrugCustomer: any[] = [];
+    griddataHospital: Array<{ hospitalName: string; quantity: number; totalValue: number }> = [];
+    hospitalSummaryRows: Array<{ hospitalName: string; quantity: number; totalValue: number }> = [];
+    hospitalSummaryFilteredRows: Array<{ hospitalName: string; quantity: number; totalValue: number }> = [];
+    hospitalSummarySearch = '';
+    hospitalSummaryPage = 1;
+    hospitalSummaryPageSize = 10;
     // ตัวแปรเพิ่มเติม
     private dataSubscription: Subscription | null = null;
     private subscriptions: Subscription[] = [];
@@ -811,7 +818,105 @@ export class SalesDashboardComponent {
             this.prepareForecastChart(this.Group_Pay_Drug, this.List_product, this.drugCode);   
             // this.getKpis(this.Group_Pay_Drug, this.List_product, this.drugCode);
             this.prepareQuantityValueBarChart();
+            this.prepareHospitalSummaryTable();
         });   
+    }
+
+    prepareHospitalSummaryTable(): void {
+      if (!Array.isArray(this.Group_Pay_Drug) || this.Group_Pay_Drug.length === 0) {
+        this.hospitalSummaryRows = [];
+        this.hospitalSummaryFilteredRows = [];
+        this.griddataHospital = [];
+        this.hospitalSummaryPage = 1;
+        return;
+      }
+
+      const grouped: Record<string, { hospitalName: string; quantity: number; totalValue: number }> = {};
+
+      this.Group_Pay_Drug.forEach((item: any) => {
+        const customerId = item.CustomerId || item.CustomerCode || item.Customer_ID || item.DataCode || '';
+        const customer = this.List_MAS_Customer.find((c: any) =>
+          (c.DataCode === customerId) ||
+          (c.CustomerId === customerId) ||
+          (c.IDA === customerId) ||
+          (String(c.IDA) === String(customerId))
+        );
+        const hospitalName = item.CustomerNameTh || customer?.CustomerNameTh || customer?.CustomerName || item.CustomerName || 'ไม่ระบุ';
+
+        const productCode = item.ProductCode || '';
+        const drug = this.LIST_MAS_DRUG.find((d: any) => d.ProductCode === productCode);
+        const price = parseFloat(drug?.ProductPrice || '0');
+        const quantity = parseFloat(item.PurchaseOrderItemApprovedAmount || '0');
+        const totalValue = quantity * price;
+
+        const key = customerId || hospitalName;
+        if (!grouped[key]) {
+          grouped[key] = {
+            hospitalName,
+            quantity: 0,
+            totalValue: 0
+          };
+        }
+        grouped[key].quantity += quantity;
+        grouped[key].totalValue += totalValue;
+      });
+
+      this.hospitalSummaryRows = Object.values(grouped).sort((a, b) => b.totalValue - a.totalValue);
+      this.hospitalSummaryPage = 1;
+      this.applyHospitalSummarySearch();
+      this.refreshHospitalSummaryGridData();
+    }
+
+    onHospitalSummarySearchChange(): void {
+      this.hospitalSummaryPage = 1;
+      this.applyHospitalSummarySearch();
+      this.refreshHospitalSummaryGridData();
+    }
+
+    private get pagedHospitalSummaryRows(): Array<{ hospitalName: string; quantity: number; totalValue: number }> {
+      const start = (this.hospitalSummaryPage - 1) * this.hospitalSummaryPageSize;
+      const end = start + this.hospitalSummaryPageSize;
+      return this.hospitalSummaryFilteredRows.slice(start, end);
+    }
+
+    onHospitalSummaryPageChange(page: number): void {
+      this.hospitalSummaryPage = page;
+      this.refreshHospitalSummaryGridData();
+    }
+
+    private refreshHospitalSummaryGridData(): void {
+      this.griddataHospital = [...this.pagedHospitalSummaryRows];
+    }
+
+    private applyHospitalSummarySearch(): void {
+      const keyword = (this.hospitalSummarySearch || '').trim().toLowerCase();
+      if (!keyword) {
+        this.hospitalSummaryFilteredRows = [...this.hospitalSummaryRows];
+        return;
+      }
+      this.hospitalSummaryFilteredRows = this.hospitalSummaryRows.filter((row) =>
+        String(row.hospitalName || '').toLowerCase().includes(keyword) ||
+        String(row.quantity || '').toLowerCase().includes(keyword) ||
+        String(row.totalValue || '').toLowerCase().includes(keyword)
+      );
+    }
+
+    downloadHospitalSummaryExcel(): void {
+      if (!this.hospitalSummaryRows.length) {
+        return;
+      }
+      const rows = this.hospitalSummaryRows.map((r, index) => ({
+        'ลำดับ': index + 1,
+        'โรงพยาบาล': r.hospitalName,
+        'ปริมาณ': Number(r.quantity || 0),
+        'มูลค่าทั้งหมด': Number(r.totalValue || 0)
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'HospitalSummary');
+      const fileName = `hospital_summary_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
     }
 
     loadDataService(): void {
@@ -1332,14 +1437,14 @@ getKpis(historyData: any[], stockData: any[], productCode: string): void {
       legend: { position: 'top' },
       grid: { strokeDashArray: 4 },
       tooltip: { shared: true, y: { formatter: (v: number) => (v == null ? '' : Math.round(v).toLocaleString()) } },
-      title: { text: 'ยอดใช้จริง vs คาดการณ์ vs สต็อกคงเหลือ', align: 'left' },
+      title: { text: '', align: 'left' },
       xaxis: { categories },
       yaxis: { decimalsInFloat: 0, min: yMin, max: yMax, labels: { formatter: (v: number) => Math.round(v).toLocaleString() } },
       series: [
         { name: 'ประวัติการใช้',  data: seriesActual },
-        { name: 'คาดการณ์ยอดใช้', data: seriesForecast },
+        { name: 'การคาดการณ์ยอดใช้ยา', data: seriesForecast },
         { name: 'สต็อกคงเหลือ',   data: seriesStock },
-        { name: 'ROP',            data: seriesROP }
+        { name: 'จุดสั่งซื้อ(ROP)',            data: seriesROP }
       ],
       states: {
         normal: { filter: { type: 'none', value: 0 } },
